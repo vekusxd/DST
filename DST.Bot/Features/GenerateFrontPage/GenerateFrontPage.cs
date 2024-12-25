@@ -38,7 +38,6 @@ public static class GenerateFrontPage
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
                 await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
-                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -323,7 +322,12 @@ public static class GenerateFrontPage
             user.FrontPageData.SupervisorJobTitle = message.Text;
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();
-            await _menuHelper.SendMainMenu(message);
+            await _botClient.SendDocument(message.Chat, new InputFileStream(GeneratePdf(user.FrontPageData), "result.pdf"),
+                caption: "Ваш документ",
+                replyMarkup: new ReplyKeyboardMarkup()
+                    .AddNewRow("Создать титульный лист")
+                    .AddNewRow("Информация по введению в дипломной работе")
+                    .AddNewRow("Поиск источников и литературы по теме"));
             user.FrontPageData = new FrontPageData();
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();

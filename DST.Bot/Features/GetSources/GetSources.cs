@@ -30,7 +30,7 @@ public static class GetSources
             var client = _clientFactory.CreateClient("cyberleninka");
             
             var response = await client.PostAsJsonAsync("api/search",
-                new CyberLeninkaRequest { From = 0, Size = 3, Mode = "articles", Query = message.Text! });
+                new CyberLeninkaRequest { From = 0, Size = 100, Mode = "articles", Query = message.Text! });
             response.EnsureSuccessStatusCode();
 
             var responseBody = await response.Content.ReadFromJsonAsync<CyberLeninkaResponse>();
@@ -51,7 +51,7 @@ public static class GetSources
 
             var sb = new StringBuilder();
 
-            sb.AppendLine("```");
+            // sb.AppendLine("```");
             foreach (var article in articles)
             {
                 sb.AppendLine($"Название статьи: {article.Name}");
@@ -63,18 +63,19 @@ public static class GetSources
                 sb.AppendLine($"Ссылка на журнал: {article.JournalLink}");
                 sb.AppendLine();
             }
-
-            sb.AppendLine("```");
+            // sb.AppendLine("```");
+            
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
 
             await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
-            
-            await _botClient.SendMessage(message.Chat, sb.ToString(), ParseMode.MarkdownV2,
+
+            await _botClient.SendDocument(message.Chat, InputFile.FromStream(stream, $"articles {DateTime.Now:dd-MM-yyyy hh.mm}.txt"), caption:"Найденные статьи",
                 replyMarkup: new ReplyKeyboardMarkup()
                     .AddNewRow("Создать титульный лист")
                     .AddNewRow("Информация по введению в дипломной работе")
                     .AddNewRow("Поиск источников и литературы по теме"));;
             return;
-
+            
             string CleanHtml(string input) =>
                 input.Replace("<b>", "").Replace("</b>", "").Replace("<br>", "").Replace("<br/>", "").Trim();
         }
