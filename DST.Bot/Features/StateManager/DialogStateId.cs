@@ -1,8 +1,11 @@
-﻿namespace DST.Bot.Features.StateManager;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DST.Bot.Features.StateManager;
 
 /// <summary>
 /// Уникальные Id для состояний диалога, желательно не создавать реализаций  у которых они совпадают, поведение не тестировалось
 /// </summary>
+[SuppressMessage("ReSharper", "InconsistentNaming")] //тварь ругается
 public enum DialogStateId
 {
     /// <summary>
@@ -18,5 +21,13 @@ public enum DialogStateId
     FrontPageWaitSupervisorAcademicTitle,
     FrontPageWaitSupervisorAcademicDegree,
     FrontPageWaitSupervisorJobTitle,
-    WaitSourceQueryState
+    WaitSourceQueryState,
+    FirstTimeState,
+    PsychologicalTestFirstQuestionState,
+    PsychologicalTestSecondQuestionState,
+    PsychologicalTestThirdQuestionState,
+    PsychologicalTestFourthQuestionState,
+    PsychologicalTestFifthQuestionState,
+    PsychologicalTestSixthQuestionState,
+    PsychologicalTestXSeventhQuestionState,
 }

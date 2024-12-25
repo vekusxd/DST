@@ -1,6 +1,8 @@
-﻿using Telegram.Bot;
+﻿using DST.Bot.Features.CommunicationStyleFactories;
+using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
+using User = DST.Bot.Entities.User;
 
 namespace DST.Bot.Features.Common;
 
@@ -13,9 +15,11 @@ public class MenuHelper
         _botClient = botClient;
     }
 
-    public Task SendMainMenu(Message message)
+    public Task SendMainMenu(Message message, User user)
     {
-        return Task.FromResult(_botClient.SendMessage(message.Chat.Id, "Здесь будет меню и какая-то важная информация",
+        var dialogFactory = ICommunicationStyleFactory.CreateFactory(user.PsychologicalTestPoints);
+        return Task.FromResult(_botClient.SendMessage(message.Chat.Id,
+            $"Здесь будет меню и сообщение о приветствии. {dialogFactory.GetMainMenuMessage()}. Модель общения: {dialogFactory}(будет отображаться только во время разработки)",
             replyMarkup: new ReplyKeyboardMarkup()
                 .AddNewRow("Создать титульный лист")
                 .AddNewRow("Информация по введению в дипломной работе")

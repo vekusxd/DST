@@ -17,65 +17,78 @@ public static class GetSources
         private readonly IHttpClientFactory _clientFactory;
         private readonly ITelegramBotClient _botClient;
         private readonly UserHelper _userHelper;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitSourceQueryState(IHttpClientFactory clientFactory, ITelegramBotClient botClient, UserHelper userHelper)
+        public WaitSourceQueryState(IHttpClientFactory clientFactory, ITelegramBotClient botClient,
+            UserHelper userHelper, MenuHelper menuHelper)
         {
             _clientFactory = clientFactory;
             _botClient = botClient;
             _userHelper = userHelper;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
-            var client = _clientFactory.CreateClient("cyberleninka");
-            
-            var response = await client.PostAsJsonAsync("api/search",
-                new CyberLeninkaRequest { From = 0, Size = 100, Mode = "articles", Query = message.Text! });
-            response.EnsureSuccessStatusCode();
-
-            var responseBody = await response.Content.ReadFromJsonAsync<CyberLeninkaResponse>();
-
-            Console.WriteLine($"Найдено статей: {responseBody!.Found}");
-
-            var articles = responseBody.Articles.Select(r =>
-                new CyberLeninkaTelegramResponse
-                {
-                    Annotation = CleanHtml(r.Annotation),
-                    Name = CleanHtml(r.Name),
-                    Link = $"https://cyberleninka.ru{r.Link}",
-                    Journal = r.Journal,
-                    JournalLink = $"https://cyberleninka.ru{r.JournalLink}",
-                    AuthorsString = string.Join(", ", r.Authors),
-                    Year = r.Year,
-                });
-
-            var sb = new StringBuilder();
-
-            // sb.AppendLine("```");
-            foreach (var article in articles)
+            switch (message.Text)
             {
-                sb.AppendLine($"Название статьи: {article.Name}");
-                sb.AppendLine($"Аннотация: {article.Annotation}");
-                sb.AppendLine($"Ссылка на статью: {article.Link}");
-                sb.AppendLine($"Авторы:  {article.AuthorsString}");
-                sb.AppendLine($"Год: {article.Year}");
-                sb.AppendLine($"Журнал: {article.Journal}");
-                sb.AppendLine($"Ссылка на журнал: {article.JournalLink}");
-                sb.AppendLine();
+                case "Отмена":
+                    await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+                    await _menuHelper.SendMainMenu(message, user);
+                    break;
+                default:
+                    var client = _clientFactory.CreateClient("cyberleninka");
+
+                    var response = await client.PostAsJsonAsync("api/search",
+                        new CyberLeninkaRequest { From = 0, Size = 100, Mode = "articles", Query = message.Text! });
+                    response.EnsureSuccessStatusCode();
+
+                    var responseBody = await response.Content.ReadFromJsonAsync<CyberLeninkaResponse>();
+
+                    Console.WriteLine($"Найдено статей: {responseBody!.Found}");
+
+                    var articles = responseBody.Articles.Select(r =>
+                        new CyberLeninkaTelegramResponse
+                        {
+                            Annotation = CleanHtml(r.Annotation),
+                            Name = CleanHtml(r.Name),
+                            Link = $"https://cyberleninka.ru{r.Link}",
+                            Journal = r.Journal,
+                            JournalLink = $"https://cyberleninka.ru{r.JournalLink}",
+                            AuthorsString = string.Join(", ", r.Authors),
+                            Year = r.Year,
+                        });
+
+                    var sb = new StringBuilder();
+
+                    foreach (var article in articles)
+                    {
+                        sb.AppendLine($"Название статьи: {article.Name}");
+                        sb.AppendLine($"Аннотация: {article.Annotation}");
+                        sb.AppendLine($"Ссылка на статью: {article.Link}");
+                        sb.AppendLine($"Авторы:  {article.AuthorsString}");
+                        sb.AppendLine($"Год: {article.Year}");
+                        sb.AppendLine($"Журнал: {article.Journal}");
+                        sb.AppendLine($"Ссылка на журнал: {article.JournalLink}");
+                        sb.AppendLine();
+                    }
+
+                    var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
+
+                    await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+
+                    await _botClient.SendDocument(message.Chat,
+                        InputFile.FromStream(stream, $"articles {DateTime.Now:dd-MM-yyyy hh.mm}.txt"),
+                        caption: "Найденные статьи",
+                        replyMarkup: new ReplyKeyboardMarkup()
+                            .AddNewRow("Создать титульный лист")
+                            .AddNewRow("Информация по введению в дипломной работе")
+                            .AddNewRow("Поиск источников и литературы по теме"));
+                    ;
+                    break;
             }
-            // sb.AppendLine("```");
-            
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(sb.ToString()));
-
-            await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
-
-            await _botClient.SendDocument(message.Chat, InputFile.FromStream(stream, $"articles {DateTime.Now:dd-MM-yyyy hh.mm}.txt"), caption:"Найденные статьи",
-                replyMarkup: new ReplyKeyboardMarkup()
-                    .AddNewRow("Создать титульный лист")
-                    .AddNewRow("Информация по введению в дипломной работе")
-                    .AddNewRow("Поиск источников и литературы по теме"));;
             return;
-            
+
             string CleanHtml(string input) =>
                 input.Replace("<b>", "").Replace("</b>", "").Replace("<br>", "").Replace("<br/>", "").Trim();
         }

@@ -19,14 +19,16 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(255)
             .IsRequired();
 
-        builder.Property(u => u.DialogStateId)
-            .HasDefaultValue(DialogStateId.DefaultState);
+        builder.Property(u => u.PsychologicalTestPoints)
+            .HasDefaultValue(0);
 
         builder.HasOne(u => u.FrontPageData)
             .WithOne(d => d.User)
             .HasForeignKey<FrontPageData>(da => da.UserId);
-        
-        builder.Navigation(u => u.FrontPageData).AutoInclude();
 
+        builder.Property(u => u.PsychologicalType)
+            .HasDefaultValue(PsychologicalType.NotSet);
+
+        builder.Navigation(u => u.FrontPageData).AutoInclude();
     }
 }

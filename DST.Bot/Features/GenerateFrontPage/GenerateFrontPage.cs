@@ -38,6 +38,7 @@ public static class GenerateFrontPage
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
                 await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -56,11 +57,13 @@ public static class GenerateFrontPage
     {
         private readonly ITelegramBotClient _botClient;
         private readonly AppDbContext _dbContext;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitCourseState(ITelegramBotClient botClient, AppDbContext dbContext)
+        public WaitCourseState(ITelegramBotClient botClient, AppDbContext dbContext, MenuHelper menuHelper)
         {
             _botClient = botClient;
             _dbContext = dbContext;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -71,8 +74,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -108,7 +110,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _menuHelper.SendMainMenu(message);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -144,7 +146,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _menuHelper.SendMainMenu(message);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -180,7 +182,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _menuHelper.SendMainMenu(message);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -216,7 +218,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _menuHelper.SendMainMenu(message);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -252,7 +254,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _menuHelper.SendMainMenu(message);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
@@ -288,7 +290,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _menuHelper.SendMainMenu(message);
+                await _menuHelper.SendMainMenu(message, user);
             }
             else
             {

@@ -1,5 +1,6 @@
 ﻿using DST.Bot.Database;
 using DST.Bot.Features.Common;
+using DST.Bot.Features.CommunicationStyleFactories;
 using DST.Bot.Features.StateManager;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -24,13 +25,15 @@ public class DefaultState : IDialogState
 
     public async Task Handle(Message message, User user)
     {
+        var dialogFactory = ICommunicationStyleFactory.CreateFactory(user.PsychologicalTestPoints);
+        
         switch (message.Text)
         {
             case "Создать титульный лист":
                 user.DialogStateId = DialogStateId.FrontPageWaitInitials;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Введите ваши инициалы", replyMarkup:new ReplyKeyboardMarkup().AddButton("Отмена"));
+                await _botClient.SendMessage(message.Chat.Id, $"{dialogFactory.FrontPageGenerationMessage()}.Введите ваши инициалы", replyMarkup:new ReplyKeyboardMarkup().AddButton("Отмена"));
                 break;
             case "Информация по введению в дипломной работе":
                 await _botClient.SendMessage(message.Chat, """
@@ -62,11 +65,11 @@ public class DefaultState : IDialogState
                                                            
                 break;
             case "Поиск источников и литературы по теме":
-                await _botClient.SendMessage(message.Chat, "Введите название темы");
                 await _helper.UpdateUserState(user, DialogStateId.WaitSourceQueryState);
+                await _botClient.SendMessage(message.Chat, $"{dialogFactory.SourceFinderMessage()}.Введите название темы", replyMarkup:new ReplyKeyboardMarkup().AddNewRow("Отмена"));
                 break;
             default:
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
+                await _botClient.SendMessage(message.Chat.Id, $"Здесь будет меню и сообщение о приветствии. {dialogFactory.GetMainMenuMessage()}. Модель общения: {dialogFactory}(будет отображаться только во время разработки)",
                     replyMarkup: new ReplyKeyboardMarkup()
                         .AddNewRow("Создать титульный лист")
                         .AddNewRow("Информация по введению в дипломной работе")
