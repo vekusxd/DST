@@ -16,6 +16,7 @@ builder.Services
     .AddStateManagement();
 
 builder.Services.AddScoped<UserHelper>();
+builder.Services.AddScoped<MenuHelper>();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? throw new Exception("No connection string was found");

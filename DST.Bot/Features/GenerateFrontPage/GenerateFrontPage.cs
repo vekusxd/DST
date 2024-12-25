@@ -23,12 +23,14 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly UserHelper _userHelper;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, UserHelper userHelper)
+        public WaitInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, UserHelper userHelper, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _userHelper = userHelper;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -36,8 +38,7 @@ public static class GenerateFrontPage
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
                 await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню  сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -45,7 +46,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData { Initials = message.Text };
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat, "Введите ваш курс");
+                await _botClient.SendMessage(message.Id.ToString(), "Введите ваш курс");
             }
         }
 
@@ -91,11 +92,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitProfileState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitProfileState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -106,8 +109,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -126,11 +128,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitThemeState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitThemeState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -141,8 +145,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -161,11 +164,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitGroupState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitGroupState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -176,8 +181,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -196,11 +200,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitSupervisorInitialsState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitSupervisorInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -211,8 +217,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -231,11 +236,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitSupervisorAcademicTitleState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitSupervisorAcademicTitleState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -246,8 +253,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -266,11 +272,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitSupervisorAcademicDegreeState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitSupervisorAcademicDegreeState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -281,8 +289,7 @@ public static class GenerateFrontPage
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
+                await _menuHelper.SendMainMenu(message);
             }
             else
             {
@@ -301,11 +308,13 @@ public static class GenerateFrontPage
     {
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
+        private readonly MenuHelper _menuHelper;
 
-        public WaitSupervisorJobTitleState(AppDbContext dbContext, ITelegramBotClient botClient)
+        public WaitSupervisorJobTitleState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
+            _menuHelper = menuHelper;
         }
 
         public async Task Handle(Message message, User user)
@@ -314,10 +323,7 @@ public static class GenerateFrontPage
             user.FrontPageData.SupervisorJobTitle = message.Text;
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();
-            await _botClient.SendDocument(message.Chat, new InputFileStream(GeneratePdf(user.FrontPageData), "result.pdf"),
-                caption: "Ваш документ",
-                replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
-
+            await _menuHelper.SendMainMenu(message);
             user.FrontPageData = new FrontPageData();
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();

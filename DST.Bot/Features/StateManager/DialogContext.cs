@@ -9,37 +9,6 @@ namespace DST.Bot.Features.StateManager;
 
 public static class DialogContext
 {
-    public class DefaultState : IDialogState
-    {
-        private readonly ITelegramBotClient _botClient;
-        private readonly AppDbContext _dbContext;
-
-        public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext)
-        {
-            _botClient = botClient;
-            _dbContext = dbContext;
-        }
-
-        public async Task Handle(Message message, User user)
-        {
-            switch (message.Text)
-            {
-                case "Создать титульный лист":
-                    user.DialogStateId = DialogStateId.FrontPageWaitInitials;
-                    _dbContext.Update(user);
-                    await _dbContext.SaveChangesAsync();
-                    await _botClient.SendMessage(message.Chat.Id, "Введите ваши инициалы", replyMarkup:new ReplyKeyboardMarkup().AddButton("Отмена"));
-                    break;
-                default:
-                    await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                        replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист"));
-                    break;
-            }
-        }
-
-        public DialogStateId DialogStateId { get; } = DialogStateId.DefaultState;
-    }
-
     public static IServiceCollection AddStateManagement(this IServiceCollection services)
     {
         services.Scan(scan => scan
