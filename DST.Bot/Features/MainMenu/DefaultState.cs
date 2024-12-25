@@ -1,4 +1,5 @@
 ﻿using DST.Bot.Database;
+using DST.Bot.Features.Common;
 using DST.Bot.Features.StateManager;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -12,11 +13,13 @@ public class DefaultState : IDialogState
 {
     private readonly ITelegramBotClient _botClient;
     private readonly AppDbContext _dbContext;
+    private readonly UserHelper _helper;
 
-    public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext)
+    public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper helper)
     {
         _botClient = botClient;
         _dbContext = dbContext;
+        _helper = helper;
     }
 
     public async Task Handle(Message message, User user)
@@ -58,9 +61,16 @@ public class DefaultState : IDialogState
                                                            , ParseMode.MarkdownV2);
                                                            
                 break;
+            case "Поиск источников и литературы по теме":
+                await _botClient.SendMessage(message.Chat, "Введите название темы");
+                await _helper.UpdateUserState(user, DialogStateId.WaitSourceQueryState);
+                break;
             default:
                 await _botClient.SendMessage(message.Chat.Id, "Здесь будет меню и сообщение о приветствии",
-                    replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист").AddNewRow("Информация по введению в дипломной работе"));
+                    replyMarkup: new ReplyKeyboardMarkup()
+                        .AddNewRow("Создать титульный лист")
+                        .AddNewRow("Информация по введению в дипломной работе")
+                        .AddNewRow("Поиск источников и литературы по теме"));
                 break;
         }
     }

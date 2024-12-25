@@ -17,5 +17,6 @@ public enum DialogStateId
     FrontPageWaitSupervisorInitials,
     FrontPageWaitSupervisorAcademicTitle,
     FrontPageWaitSupervisorAcademicDegree,
-    FrontPageWaitSupervisorJobTitle
+    FrontPageWaitSupervisorJobTitle,
+    WaitSourceQueryState
 }

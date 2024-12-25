@@ -16,6 +16,9 @@ public class MenuHelper
     public Task SendMainMenu(Message message)
     {
         return Task.FromResult(_botClient.SendMessage(message.Chat.Id, "Здесь будет меню и какая-то важная информация",
-            replyMarkup: new ReplyKeyboardMarkup().AddButton("Создать титульный лист").AddNewRow("Информация по введению в дипломной работе")));
+            replyMarkup: new ReplyKeyboardMarkup()
+                .AddNewRow("Создать титульный лист")
+                .AddNewRow("Информация по введению в дипломной работе")
+                .AddNewRow("Поиск источников и литературы по теме")));
     }
 }
