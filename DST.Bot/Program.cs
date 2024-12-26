@@ -2,6 +2,7 @@ using DST.Bot.Database;
 using DST.Bot.Features.Common;
 using DST.Bot.Features.GenerateFrontPage;
 using DST.Bot.Features.GetSources;
+using DST.Bot.Features.GigaChat;
 using DST.Bot.Features.SetupBot;
 using DST.Bot.Features.StateManager;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +15,11 @@ builder.Services.AddOpenApi();
 QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services
-    .AddTgBotServices(builder.Configuration)
-    .AddStateManagement();
+    .AddTg(builder.Configuration)
+    .AddHelper()
+    .AddStateManagement()
+    .AddGigaChat(builder.Configuration);
 
-builder.Services.AddScoped<UserHelper>();
-builder.Services.AddScoped<MenuHelper>();
 builder.Services.AddHttpClient("cyberleninka",o =>
 {
     o.BaseAddress = new Uri("https://cyberleninka.ru/");

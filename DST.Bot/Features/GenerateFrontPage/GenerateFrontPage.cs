@@ -329,7 +329,9 @@ public static class GenerateFrontPage
                 replyMarkup: new ReplyKeyboardMarkup()
                     .AddNewRow("Создать титульный лист")
                     .AddNewRow("Информация по введению в дипломной работе")
-                    .AddNewRow("Поиск источников и литературы по теме"));
+                    .AddNewRow("Ответ на вопрос")
+                    .AddNewRow("Поиск источников и литературы по теме")
+                    .AddNewRow("Пройти заново психологический тест"));
             user.FrontPageData = new FrontPageData();
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();

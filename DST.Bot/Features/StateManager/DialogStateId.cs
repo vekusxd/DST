@@ -30,4 +30,5 @@ public enum DialogStateId
     PsychologicalTestFifthQuestionState,
     PsychologicalTestSixthQuestionState,
     PsychologicalTestXSeventhQuestionState,
+    GigaChatQuestionState
 }

@@ -10,7 +10,7 @@ namespace DST.Bot.Features.SetupBot;
 
 public static class SetupBot
 {
-    public static IServiceCollection AddTgBotServices(this IServiceCollection services, ConfigurationManager configurationManager)
+    public static IServiceCollection AddTg(this IServiceCollection services, IConfigurationManager configurationManager)
     {
         services.Configure<TgBotOptions>(configurationManager.GetRequiredSection(TgBotOptions.TgBot));
         
