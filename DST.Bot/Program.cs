@@ -18,6 +18,11 @@ builder.Services
     .AddStateManagement()
     .AddGigaChat(builder.Configuration);
 
+if (builder.Environment.IsProduction())
+{
+    builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("APP_URL") ?? "http://localhost:5000");
+}
+
 builder.Services.AddHttpClient("cyberleninka",o =>
 {
     o.BaseAddress = new Uri("https://cyberleninka.ru/");
