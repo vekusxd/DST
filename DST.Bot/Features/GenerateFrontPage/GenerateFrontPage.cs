@@ -43,10 +43,10 @@ public static class GenerateFrontPage
             else
             {
                 user.DialogStateId = DialogStateId.FrontPageWaitCourse;
-                user.FrontPageData = new FrontPageData { Initials = message.Text };
+                user.FrontPageData = new FrontPageData { Initials = message.Text, Course = null};
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
-                await _botClient.SendMessage(message.Id.ToString(), "Введите ваш курс");
+                await _botClient.SendMessage(message.Chat, "Введите ваш курс");
             }
         }
 
@@ -340,6 +340,8 @@ public static class GenerateFrontPage
 
     private static MemoryStream GeneratePdf(FrontPageData frontPageData)
     {
+        
+        var culture = CultureInfo.CreateSpecificCulture("ru-RU");
         var doc = QuestPDF.Fluent.Document.Create(container =>
         {
             container.Page(page =>
@@ -440,7 +442,7 @@ public static class GenerateFrontPage
                                 var currentDate = DateTime.Now;
                                 var thirdColumnDescriptor = info.Item()
                                     .Text(
-                                        $"«{currentDate.Day}» {CultureInfo.CurrentCulture.DateTimeFormat.MonthGenitiveNames.ElementAt(currentDate.Month - 1)} {currentDate.Year} г.");
+                                        $"«{currentDate.Day}» {culture.DateTimeFormat.MonthGenitiveNames.ElementAt(currentDate.Month - 1)} {currentDate.Year} г.");
                                 thirdColumnDescriptor.FontSize(14);
                                 thirdColumnDescriptor.FontFamily(["Times New Roman"]);
 
@@ -475,7 +477,7 @@ public static class GenerateFrontPage
                                 var currentDate = DateTime.Now;
                                 var thirdColumnDescriptor = info.Item()
                                     .Text(
-                                        $"«{currentDate.Day}» {CultureInfo.CurrentCulture.DateTimeFormat.MonthGenitiveNames.ElementAt(currentDate.Month - 1)} {currentDate.Year} г.");
+                                        $"«{currentDate.Day}» {culture.DateTimeFormat.MonthGenitiveNames.ElementAt(currentDate.Month - 1)} {currentDate.Year} г.");
                                 thirdColumnDescriptor.FontSize(14);
                                 thirdColumnDescriptor.FontFamily(["Times New Roman"]);
 

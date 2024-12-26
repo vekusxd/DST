@@ -30,14 +30,11 @@ public class DefaultState : IDialogState
         switch (message.Text)
         {
             case "Создать титульный лист":
-                user.DialogStateId = DialogStateId.FrontPageWaitInitials;
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _helper.UpdateUserState(user, DialogStateId.FrontPageWaitInitials);
                 await _botClient.SendMessage(message.Chat.Id, $"{dialogFactory.FrontPageGenerationMessage()}.Введите ваши инициалы", replyMarkup:new ReplyKeyboardMarkup().AddButton("Отмена"));
                 break;
             case "Информация по введению в дипломной работе":
                 await _botClient.SendMessage(message.Chat, """
-                            ```
                             Введение:
                             Это важная часть, которая задает общий тон всей работы. Оно включает в себя несколько ключевых элементов, таких как актуальность, постановка проблемы, цели и задачи исследования, а также объект и предмет исследования.
                                                             
@@ -59,9 +56,8 @@ public class DefaultState : IDialogState
                                 Структура работы:
                                 Кратко описать, как будет организована работа, какие разделы будут включены и что будет рассмотрено в каждом из них.
                                 Указать, как каждый раздел будет способствовать достижению общей цели исследования
-                                ```
                             """
-                                                           , ParseMode.MarkdownV2);
+                                                           );
                                                            
                 break;
             case "Поиск источников и литературы по теме":
