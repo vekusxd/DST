@@ -3,6 +3,8 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
+using DST.Bot.Database;
+using DST.Bot.Entities;
 using DST.Bot.Features.Common;
 using DST.Bot.Features.StateManager;
 using Microsoft.Extensions.Options;
@@ -60,13 +62,18 @@ public static class GigaChat
                         replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
                 case "Помоги с параметрами темы":
-                    await _botClient.SendMessage(message.Chat, "В процессе реализации");
+                    await _userHelper.UpdateUserState(user, DialogStateId.WaitForTopicParamQueryState);
+                    await _botClient.SendMessage(message.Chat, "Введите вашу тему",
+                        replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
-                case "Помоги с темами для курсовой":
-                    await _botClient.SendMessage(message.Chat, "В процессе реализации");
+                case "Придумай темы для курсовой":
+                    await _userHelper.UpdateUserState(user, DialogStateId.WaitForGenerateTopicCountryQueryState);
+                    await _botClient.SendMessage(message.Chat, "Введите страну",
+                        replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
                 case "Помоги со структурой работы":
-                    await _botClient.SendMessage(message.Chat, "В процессе реализации");
+                    await _userHelper.UpdateUserState(user, DialogStateId.WaitForGeneratedContentQueryState);
+                    await _botClient.SendMessage(message.Chat, "Введите вашу тему");
                     break;
                 case "Отмена":
                     await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
@@ -113,7 +120,7 @@ public static class GigaChat
                     var prompt =
                         $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Во-первых напиши определение {word}, во-вторых создай список, первым номером списка будет первый пример предложения, всего список должен состоять из двух примеров предложений в которых обязательно будет {word} как часть этих примеров предложений.";
 
-                    var response = await _gigaChatFetcher.GetResponse(message.Text!);
+                    var response = await _gigaChatFetcher.GetResponse(prompt!);
 
                     var encodedPart = HttpUtility.UrlEncode(message.Text);
 
@@ -167,7 +174,7 @@ public static class GigaChat
                     var prompt =
                         $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Создай мне пять тем для моей курсовой работы, которые будут близки по смыслу и значению с этой темой '{exampleTopic}'.";
 
-                    var response = await _gigaChatFetcher.GetResponse(message.Text!);
+                    var response = await _gigaChatFetcher.GetResponse(prompt);
 
                     await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
                     await _telegramBotClient.SendMessage(message.Chat, response.ToString(),
@@ -177,6 +184,252 @@ public static class GigaChat
         }
 
         public DialogStateId DialogStateId { get; } = DialogStateId.WaitForSimilarTopicQueryState;
+    }
+
+
+    public class WaitForGeneratedContentQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly GigaChatFetcher _gigaChatFetcher;
+
+        public WaitForGeneratedContentQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, GigaChatFetcher gigaChatFetcher)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _gigaChatFetcher = gigaChatFetcher;
+        }
+
+        public async Task Handle(Message message, User user)
+        {
+            switch (message.Text)
+            {
+                case "Отмена":
+                    await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                    await _menuHelper.SendGigaChatMenu(message, user);
+                    break;
+                default:
+                    var topic = message.Text!;
+                    var prompt =
+                        $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Напиши содержание(структуру) курсовой работы на тему {topic}, в ней должно быть минимум две главы и два параграфа.";
+
+                    var response = await _gigaChatFetcher.GetResponse(prompt);
+
+                    await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                    await _telegramBotClient.SendMessage(message.Chat, response.ToString(),
+                        replyMarkup: MenuHelper.GigaChatMenuMarkup);
+                    break;
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForGeneratedContentQueryState;
+    }
+
+    public class WaitForTopicParamQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly GigaChatFetcher _gigaChatFetcher;
+
+        public WaitForTopicParamQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, GigaChatFetcher gigaChatFetcher)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _gigaChatFetcher = gigaChatFetcher;
+        }
+
+        public async Task Handle(Message message, User user)
+        {
+            switch (message.Text)
+            {
+                case "Отмена":
+                    await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                    await _menuHelper.SendGigaChatMenu(message, user);
+                    break;
+                default:
+                    var topic = message.Text!;
+
+                    var prompt =
+                        $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Обязательно напиши все возможные параметры темы '{topic}', без лишних конструкций, то есть какая(какие) страна(страны), язык(языки), сфера жизни, промежуток времени и тому подобное.";
+                    var response = await _gigaChatFetcher.GetResponse(prompt);
+
+                    await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                    await _telegramBotClient.SendMessage(message.Chat, response.ToString(),
+                        replyMarkup: MenuHelper.GigaChatMenuMarkup);
+                    break;
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForTopicParamQueryState;
+    }
+
+    public class WaitForGenerateTopicCountryQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly AppDbContext _dbContext;
+
+        public WaitForGenerateTopicCountryQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, AppDbContext dbContext)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _dbContext = dbContext;
+        }
+
+        public async Task Handle(Message message, User user)
+        {
+            if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
+            {
+                await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                await _menuHelper.SendGigaChatMenu(message, user);
+            }
+            else
+            {
+                user.DialogStateId = DialogStateId.WaitForGenerateTopicLanguageQueryState;
+                user.GenerateTopicData = new GenerateTopicData { Country = message.Text };
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                await _telegramBotClient.SendMessage(message.Chat, "Введите язык");
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForGenerateTopicCountryQueryState;
+    }
+
+    public class WaitForGenerateTopicLanguageQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly AppDbContext _dbContext;
+
+        public WaitForGenerateTopicLanguageQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, AppDbContext dbContext)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _dbContext = dbContext;
+        }
+
+
+        public async Task Handle(Message message, User user)
+        {
+            if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
+            {
+                user.DialogStateId = DialogStateId.GigaChatQuestionState;
+                user.GenerateTopicData = new GenerateTopicData();
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                await _menuHelper.SendGigaChatMenu(message, user);
+            }
+            else
+            {
+                user.DialogStateId = DialogStateId.WaitForGenerateTopicScopeQueryState;
+                user.GenerateTopicData.Language = message.Text;
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                await _telegramBotClient.SendMessage(message.Chat, "Введите сферу жизни");
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForGenerateTopicLanguageQueryState;
+    }
+
+    public class WaitForGenerateTopicScopeQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly AppDbContext _dbContext;
+
+        public WaitForGenerateTopicScopeQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, AppDbContext dbContext)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _dbContext = dbContext;
+        }
+
+        public async Task Handle(Message message, User user)
+        {
+            if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
+            {
+                user.DialogStateId = DialogStateId.GigaChatQuestionState;
+                user.GenerateTopicData = new GenerateTopicData();
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                await _menuHelper.SendGigaChatMenu(message, user);
+            }
+            else
+            {
+                user.DialogStateId = DialogStateId.WaitForGenerateTopicTimePeriodQueryState;
+                user.GenerateTopicData.Scope = message.Text;
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                await _telegramBotClient.SendMessage(message.Chat, "Введите промежуток времени");
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForGenerateTopicScopeQueryState;
+    }
+
+    public class WaitForGenerateTopicTimePeriodQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly AppDbContext _dbContext;
+        private readonly GigaChatFetcher _gigaChatFetcher;
+
+        public WaitForGenerateTopicTimePeriodQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, AppDbContext dbContext, GigaChatFetcher gigaChatFetcher)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _dbContext = dbContext;
+            _gigaChatFetcher = gigaChatFetcher;
+        }
+
+        public async Task Handle(Message message, User user)
+        {
+            if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
+            {
+                user.DialogStateId = DialogStateId.GigaChatQuestionState;
+                user.GenerateTopicData = new GenerateTopicData();
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                await _menuHelper.SendGigaChatMenu(message, user);
+            }
+            else
+            {
+                user.DialogStateId = DialogStateId.GigaChatQuestionState;
+                user.GenerateTopicData.TimePeriod = message.Text;
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+
+                var prompt =
+                    $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Создай мне пять тем для моей курсовой работы с такими параметрами: страна '{user.GenerateTopicData.Country}', язык '{user.GenerateTopicData.Language}', сфера жизни '{user.GenerateTopicData.Scope}', промежуток времени '{user.GenerateTopicData.TimePeriod}'.";
+
+
+                var result = await _gigaChatFetcher.GetResponse(prompt);
+                await _telegramBotClient.SendMessage(message.Chat, result.ToString(),
+                    replyMarkup: MenuHelper.GigaChatMenuMarkup);
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForGenerateTopicTimePeriodQueryState;
     }
 
     public class GigaChatFetcher
