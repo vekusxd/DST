@@ -56,7 +56,10 @@ public static class DialogContext
         services.AddKeyedScoped<IDialogState, GenerateFrontPage.GenerateFrontPage.WaitSupervisorAcademicDegreeState>(nameof(GenerateFrontPage.GenerateFrontPage.WaitSupervisorAcademicDegreeState));
         services.AddKeyedScoped<IDialogState, GenerateFrontPage.GenerateFrontPage.WaitSupervisorJobTitleState>(nameof(GenerateFrontPage.GenerateFrontPage.WaitSupervisorJobTitleState));
         services.AddKeyedScoped<IDialogState, FirstTimeEncounter.FirstTimeEncounter.FirstTimeState>(nameof(FirstTimeEncounter.FirstTimeEncounter.FirstTimeState));
-
+        services.AddKeyedScoped<IDialogState, GetSources.GetSources.FetchArticlesState>(
+            nameof(GetSources.GetSources.FetchArticlesState));
+        
+        
         services.AddScoped<DialogContextHandler>();
 
         return services;

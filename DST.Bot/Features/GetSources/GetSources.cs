@@ -19,7 +19,7 @@ public static partial class GetSources
     public static IServiceCollection AddSources(this IServiceCollection services)
     {
         services.AddHttpClient("cyberleninka", o => { o.BaseAddress = new Uri("https://cyberleninka.ru/"); });
-        services.AddHttpClient("rusneb", o => { o.BaseAddress = new Uri("https://rusneb.ru/search"); });
+        services.AddHttpClient("rusneb", o => { o.BaseAddress = new Uri("https://rusneb.ru/search/"); });
         services.AddHttpClient("codex", o => { o.BaseAddress = new Uri("https://docs.cntd.ru/search"); });
         services.AddHttpClient("bigenc",
             o => { o.BaseAddress = new Uri("https://c.bigenc.ru/content/search/suggestions"); });
@@ -242,7 +242,7 @@ public static partial class GetSources
                         if (item is null) continue;
 
                         var titleNode = item.SelectSingleNode(".//div[contains(@class, 'info_5')]/a");
-                        var title = CleanHtml(titleNode?.InnerText.Trim()!);
+                        var title = titleNode?.InnerText.Trim();
 
                         if (string.IsNullOrEmpty(title)) continue;
 
