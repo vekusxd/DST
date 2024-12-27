@@ -37,9 +37,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(u => u.GenerateTopicData)
             .WithOne(t => t.User)
             .HasForeignKey<GenerateTopicData>(t => t.UserId);
-        
-        builder.Navigation(u => u.FrontPageData).AutoInclude();
-        builder.Navigation(u => u.GenerateTopicData).AutoInclude();
     }
 }
 

@@ -26,7 +26,8 @@ public static class GenerateFrontPage
         private readonly UserHelper _userHelper;
         private readonly MenuHelper _menuHelper;
 
-        public WaitInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, UserHelper userHelper, MenuHelper menuHelper)
+        public WaitInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, UserHelper userHelper,
+            MenuHelper menuHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
@@ -44,13 +45,13 @@ public static class GenerateFrontPage
             else
             {
                 user.DialogState = nameof(WaitCourseState);
-                user.FrontPageData = new FrontPageData { Initials = message.Text, Course = null};
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
+                user.FrontPageData = new FrontPageData { Initials = message.Text, Course = null };
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите ваш курс");
             }
         }
-
     }
 
     public class WaitCourseState : IDialogState
@@ -58,34 +59,34 @@ public static class GenerateFrontPage
         private readonly ITelegramBotClient _botClient;
         private readonly AppDbContext _dbContext;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitCourseState(ITelegramBotClient botClient, AppDbContext dbContext, MenuHelper menuHelper)
+        public WaitCourseState(ITelegramBotClient botClient, AppDbContext dbContext, MenuHelper menuHelper,
+            UserHelper userHelper)
         {
             _botClient = botClient;
             _dbContext = dbContext;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitProfileState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.Course = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите ваш профиль");
             }
         }
-
     }
 
     public class WaitProfileState : IDialogState
@@ -93,34 +94,34 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitProfileState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
+        public WaitProfileState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper
+        ,UserHelper userHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitThemeState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.Profile = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите тему вашей работы");
             }
         }
-
     }
 
     public class WaitThemeState : IDialogState
@@ -128,34 +129,34 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitThemeState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
+        public WaitThemeState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper,
+            UserHelper userHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitGroupState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.Theme = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите номер вашей группы");
             }
         }
-
     }
 
     public class WaitGroupState : IDialogState
@@ -163,34 +164,34 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitGroupState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
+        public WaitGroupState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper,
+            UserHelper userHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitSupervisorInitialsState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.Group = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите инициалы вашего научного руководителя");
             }
         }
-
     }
 
     public class WaitSupervisorInitialsState : IDialogState
@@ -198,34 +199,34 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitSupervisorInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
+        public WaitSupervisorInitialsState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper,
+            UserHelper userHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitSupervisorAcademicTitleState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.SupervisorInitials = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите ученое звание вашего научного руководителя");
             }
         }
-
     }
 
     public class WaitSupervisorAcademicTitleState : IDialogState
@@ -233,34 +234,34 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitSupervisorAcademicTitleState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
+        public WaitSupervisorAcademicTitleState(AppDbContext dbContext, ITelegramBotClient botClient,
+            MenuHelper menuHelper, UserHelper userHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitSupervisorAcademicDegreeState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.SupervisorAcademicTitle = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите ученую степень вашего научного руководителя");
             }
         }
-
     }
 
     public class WaitSupervisorAcademicDegreeState : IDialogState
@@ -268,34 +269,34 @@ public static class GenerateFrontPage
         private readonly AppDbContext _dbContext;
         private readonly ITelegramBotClient _botClient;
         private readonly MenuHelper _menuHelper;
+        private readonly UserHelper _userHelper;
 
-        public WaitSupervisorAcademicDegreeState(AppDbContext dbContext, ITelegramBotClient botClient, MenuHelper menuHelper)
+        public WaitSupervisorAcademicDegreeState(AppDbContext dbContext, ITelegramBotClient botClient,
+            MenuHelper menuHelper, UserHelper userHelper)
         {
             _dbContext = dbContext;
             _botClient = botClient;
             _menuHelper = menuHelper;
+            _userHelper = userHelper;
         }
 
         public async Task Handle(Message message, User user)
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(DefaultState);
-                user.FrontPageData = new FrontPageData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitSupervisorJobTitleState);
+                await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
                 user.FrontPageData.SupervisorAcademicDegree = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, "Введите должность вашего научного руководителя");
             }
         }
-
     }
 
     public class WaitSupervisorJobTitleState : IDialogState
@@ -314,22 +315,20 @@ public static class GenerateFrontPage
         public async Task Handle(Message message, User user)
         {
             user.DialogState = nameof(DefaultState);
+            await _dbContext.Entry(user).Reference(u => u.FrontPageData).LoadAsync();
             user.FrontPageData.SupervisorJobTitle = message.Text;
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();
-            await _botClient.SendDocument(message.Chat, new InputFileStream(GeneratePdf(user.FrontPageData), "result.pdf"),
-                caption: "Ваш документ",
+            await _botClient.SendDocument(message.Chat,
+                new InputFileStream(GeneratePdf(user.FrontPageData),
+                    $"титульный_лист {DateTime.Now:dd-MM-yyyy hh.mm}.pdf"),
+                caption: "Ваш документ, преобразовать в DOCX можно здесь: https://pdf2docx.com/",
                 replyMarkup: MenuHelper.MenuMarkup);
-            user.FrontPageData = new FrontPageData();
-            _dbContext.Update(user);
-            await _dbContext.SaveChangesAsync();
         }
-
     }
 
     private static MemoryStream GeneratePdf(FrontPageData frontPageData)
     {
-        
         var culture = CultureInfo.CreateSpecificCulture("ru-RU");
         var doc = QuestPDF.Fluent.Document.Create(container =>
         {

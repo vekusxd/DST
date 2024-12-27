@@ -16,20 +16,20 @@ public class MenuHelper
     }
 
     public static ReplyKeyboardMarkup MenuMarkup => new ReplyKeyboardMarkup()
-        .AddNewRow("Создать титульный лист")
-        .AddNewRow("Информация по введению в дипломной работе")
-        .AddNewRow("Гига чат")
-        .AddNewRow("Поиск источников и литературы по теме")
-        .AddNewRow("Оформление источников и сносок")
-        .AddNewRow("Пройти заново психологический тест");
+        .AddNewRow()
+        .AddButton("Создать титульный лист").AddButton("Информация по введению в дипломной работе")
+        .AddNewRow()
+        .AddButton("Помощь с работой").AddButton("Поиск источников и литературы по теме")
+        .AddNewRow()
+        .AddButton("Оформление источников и сносок").AddButton("Пройти заново психологический тест");
 
     public static ReplyKeyboardMarkup GigaChatMenuMarkup => new ReplyKeyboardMarkup()
-        .AddNewRow("Подскажи определение термина")
-        .AddNewRow("Придумай похожие темы для курсовой")
-        .AddNewRow("Помоги с параметрами темы")
-        .AddNewRow("Придумай темы для курсовой")
-        .AddNewRow("Помоги со структурой работы")
-        .AddNewRow("Отмена");
+        .AddNewRow()
+        .AddButton("Подскажи определение термина").AddButton("Придумай похожие темы для курсовой")
+        .AddNewRow()
+        .AddButton("Помоги с параметрами темы").AddButton("Придумай темы для курсовой")
+        .AddNewRow()
+        .AddButton("Помоги со структурой работы").AddNewRow("Отмена");
 
     public static ReplyKeyboardMarkup DesignMenuMarkup => new ReplyKeyboardMarkup()
         .AddNewRow("Источник")
@@ -60,11 +60,13 @@ public class MenuHelper
 
     public Task SendSourceDesignMenu(Message message, User user)
     {
-        return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вы хотите оформить?", replyMarkup: DesignMenuMarkup));
+        return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вы хотите оформить?",
+            replyMarkup: DesignMenuMarkup));
     }
-    
+
     public Task SendDesignSourceSelectorMenu(Message message, User user)
     {
-        return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вам нужно оформить?", replyMarkup: DesignSourceSelectorMarkup));
+        return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вам нужно оформить?",
+            replyMarkup: DesignSourceSelectorMarkup));
     }
 }

@@ -73,7 +73,8 @@ public static class GigaChat
                     break;
                 case "Помоги со структурой работы":
                     await _userHelper.UpdateUserState(user, nameof(WaitForGeneratedContentQueryState));
-                    await _botClient.SendMessage(message.Chat, "Введите вашу тему");
+                    await _botClient.SendMessage(message.Chat, "Введите вашу тему",
+                        replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
                 case "Отмена":
                     await _userHelper.UpdateUserState(user, nameof(DefaultState));
@@ -84,7 +85,6 @@ public static class GigaChat
                     break;
             }
         }
-
     }
 
     public class WaitForDefinitionQueryState : IDialogState
@@ -139,7 +139,6 @@ public static class GigaChat
                     break;
             }
         }
-
     }
 
     public class WaitForSimilarTopicQueryState : IDialogState
@@ -180,7 +179,6 @@ public static class GigaChat
                     break;
             }
         }
-
     }
 
 
@@ -221,7 +219,6 @@ public static class GigaChat
                     break;
             }
         }
-
     }
 
     public class WaitForTopicParamQueryState : IDialogState
@@ -261,7 +258,6 @@ public static class GigaChat
                     break;
             }
         }
-
     }
 
     public class WaitForGenerateTopicCountryQueryState : IDialogState
@@ -290,13 +286,13 @@ public static class GigaChat
             else
             {
                 user.DialogState = nameof(WaitForGenerateTopicLanguageQueryState);
+                await _dbContext.Entry(user).Reference(u => u.GenerateTopicData).LoadAsync();
                 user.GenerateTopicData = new GenerateTopicData { Country = message.Text };
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _telegramBotClient.SendMessage(message.Chat, "Введите язык");
             }
         }
-
     }
 
     public class WaitForGenerateTopicLanguageQueryState : IDialogState
@@ -320,22 +316,19 @@ public static class GigaChat
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(GigaChatQuestionState);
-                user.GenerateTopicData = new GenerateTopicData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitForGenerateTopicScopeQueryState);
+                await _dbContext.Entry(user).Reference(u => u.GenerateTopicData).LoadAsync();
                 user.GenerateTopicData.Language = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _telegramBotClient.SendMessage(message.Chat, "Введите сферу жизни");
             }
         }
-
     }
 
     public class WaitForGenerateTopicScopeQueryState : IDialogState
@@ -358,22 +351,19 @@ public static class GigaChat
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(GigaChatQuestionState);
-                user.GenerateTopicData = new GenerateTopicData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(WaitForGenerateTopicTimePeriodQueryState);
+                await _dbContext.Entry(user).Reference(u => u.GenerateTopicData).LoadAsync();
                 user.GenerateTopicData.Scope = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _telegramBotClient.SendMessage(message.Chat, "Введите промежуток времени");
             }
         }
-
     }
 
     public class WaitForGenerateTopicTimePeriodQueryState : IDialogState
@@ -398,15 +388,13 @@ public static class GigaChat
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogState = nameof(GigaChatQuestionState);
-                user.GenerateTopicData = new GenerateTopicData();
-                _dbContext.Update(user);
-                await _dbContext.SaveChangesAsync();
+                await _userHelper.UpdateUserState(user, nameof(GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
             }
             else
             {
                 user.DialogState = nameof(GigaChatQuestionState);
+                await _dbContext.Entry(user).Reference(u => u.GenerateTopicData).LoadAsync();
                 user.GenerateTopicData.TimePeriod = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -420,7 +408,6 @@ public static class GigaChat
                     replyMarkup: MenuHelper.GigaChatMenuMarkup);
             }
         }
-
     }
 
     public class GigaChatFetcher

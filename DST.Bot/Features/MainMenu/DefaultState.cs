@@ -72,7 +72,7 @@ public class DefaultState : IDialogState
                     $"{dialogFactory.SourceFinderMessage()}.Введите название темы",
                     replyMarkup: replyMarkup);
                 break;
-            case "Гига чат":
+            case "Помощь с работой":
                 await _helper.UpdateUserState(user, nameof(GigaChat.GigaChat.GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
                 break;
