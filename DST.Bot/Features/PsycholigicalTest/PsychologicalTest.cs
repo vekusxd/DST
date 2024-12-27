@@ -1,5 +1,6 @@
 ﻿using DST.Bot.Database;
 using DST.Bot.Features.Common;
+using DST.Bot.Features.MainMenu;
 using DST.Bot.Features.StateManager;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -35,27 +36,27 @@ public static class PsychologicalTest
             {
                 case "Принимаю её с благодарностью и стараюсь улучшиться":
                     user.PsychologicalTestPoints += 30;
-                    user.DialogStateId = DialogStateId.PsychologicalTestSecondQuestionState;
+                    user.DialogState = nameof(SecondQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете общаться с людьми?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Чувствую себя обиженным, но стараюсь не показывать это":
                     user.PsychologicalTestPoints += 20;
-                    user.DialogStateId = DialogStateId.PsychologicalTestSecondQuestionState;
+                    user.DialogState = nameof(SecondQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете общаться с людьми?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Защищаюсь и объясняю свою точку зрения":
                     user.PsychologicalTestPoints += 10;
-                    user.DialogStateId = DialogStateId.PsychologicalTestSecondQuestionState;
+                    user.DialogState = nameof(SecondQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете общаться с людьми?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Игнорирую и продолжаю действовать по-своему":
-                    await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestSecondQuestionState);
+                    await _userHelper.UpdateUserState(user,  nameof(SecondQuestionState));
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете общаться с людьми?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 default:
@@ -64,7 +65,6 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestFirstQuestionState;
     }
 
     public class SecondQuestionState : IDialogState
@@ -92,27 +92,27 @@ public static class PsychologicalTest
             {
                 case "Лично, лицом к лицу":
                     user.PsychologicalTestPoints += 30;
-                    user.DialogStateId = DialogStateId.PsychologicalTestThirdQuestionState;
+                    user.DialogState = nameof(ThirdQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы относитесь к новым знакомствам?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "По телефону":
                     user.PsychologicalTestPoints += 20;
-                    user.DialogStateId = DialogStateId.PsychologicalTestThirdQuestionState;
+                    user.DialogState = nameof(ThirdQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы относитесь к новым знакомствам?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "В мессенджерах или по электронной почте":
                     user.PsychologicalTestPoints += 10;
-                    user.DialogStateId = DialogStateId.PsychologicalTestThirdQuestionState;
+                    user.DialogState = nameof(ThirdQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы относитесь к новым знакомствам?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Предпочитаю избегать общения":
-                    await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestThirdQuestionState);
+                    await _userHelper.UpdateUserState(user, nameof(ThirdQuestionState));
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы относитесь к новым знакомствам?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 default:
@@ -121,7 +121,6 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestSecondQuestionState;
     }
 
     public class ThirdQuestionState : IDialogState
@@ -149,27 +148,27 @@ public static class PsychologicalTest
             {
                 case "С радостью знакомлюсь с новыми людьми":
                     user.PsychologicalTestPoints += 30;
-                    user.DialogStateId = DialogStateId.PsychologicalTestFourthQuestionState;
+                    user.DialogState = nameof(FourthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно принимаете решения?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Знакомлюсь, но с осторожностью ":
                     user.PsychologicalTestPoints += 20;
-                    user.DialogStateId = DialogStateId.PsychologicalTestFourthQuestionState;
+                    user.DialogState = nameof(FourthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно принимаете решения?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Предпочитаю оставаться в кругу знакомых":
                     user.PsychologicalTestPoints += 10;
-                    user.DialogStateId = DialogStateId.PsychologicalTestFourthQuestionState;
+                    user.DialogState = nameof(FourthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно принимаете решения?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Избегаю новых знакомств":
-                    await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestFourthQuestionState);
+                    await _userHelper.UpdateUserState(user, nameof(FourthQuestionState));
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно принимаете решения?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 default:
@@ -178,7 +177,6 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestThirdQuestionState;
     }
 
     public class FourthQuestionState : IDialogState
@@ -206,27 +204,27 @@ public static class PsychologicalTest
             {
                 case "Быстро и интуитивно":
                     user.PsychologicalTestPoints += 30;
-                    user.DialogStateId = DialogStateId.PsychologicalTestFifthQuestionState;
+                    user.DialogState = nameof(FifthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы реагируете на изменения в жизни?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Обдумываю все возможные варианты":
                     user.PsychologicalTestPoints += 20;
-                    user.DialogStateId = DialogStateId.PsychologicalTestFifthQuestionState;
+                    user.DialogState = nameof(FifthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы реагируете на изменения в жизни?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Спрашиваю мнение других":
                     user.PsychologicalTestPoints += 10;
-                    user.DialogStateId = DialogStateId.PsychologicalTestFifthQuestionState;
+                    user.DialogState = nameof(FifthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы реагируете на изменения в жизни?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Откладываю решение на потом":
-                    await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestFifthQuestionState);
+                    await _userHelper.UpdateUserState(user,  nameof(FifthQuestionState));
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы реагируете на изменения в жизни?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 default:
@@ -235,7 +233,6 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestFourthQuestionState;
     }
 
     public class FifthQuestionState : IDialogState
@@ -263,27 +260,27 @@ public static class PsychologicalTest
             {
                 case "С лёгкостью принимаю и адаптируюсь":
                     user.PsychologicalTestPoints += 30;
-                    user.DialogStateId = DialogStateId.PsychologicalTestSixthQuestionState;
+                    user.DialogState = nameof(SixthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете проводить свободное время?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Сначала испытываю стресс, но потом привыкаю":
                     user.PsychologicalTestPoints += 20;
-                    user.DialogStateId = DialogStateId.PsychologicalTestSixthQuestionState;
+                    user.DialogState = nameof(SixthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете проводить свободное время?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Сопротивляюсь изменениям":
                     user.PsychologicalTestPoints += 10;
-                    user.DialogStateId = DialogStateId.PsychologicalTestSixthQuestionState;
+                    user.DialogState = nameof(SixthQuestionState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете проводить свободное время?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 case "Избегаю изменений любой ценой":
-                    await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestSixthQuestionState);
+                    await _userHelper.UpdateUserState(user, nameof(SixthQuestionState));
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы предпочитаете проводить свободное время?", replyMarkup: newQuestionAnswersMarkup);
                     break;
                 default:
@@ -292,7 +289,6 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestFifthQuestionState;
     }
 
     public class SixthQuestionState : IDialogState
@@ -320,27 +316,27 @@ public static class PsychologicalTest
             {
              case "В компании друзей":
                  user.PsychologicalTestPoints += 30;
-                 user.DialogStateId = DialogStateId.PsychologicalTestXSeventhQuestionState;
+                 user.DialogState = nameof(SeventhQuestionState);
                  _dbContext.Update(user);
                  await _dbContext.SaveChangesAsync();
                  await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно выражаете свои эмоции?", replyMarkup: newQuestionAnswersMarkup);
                  break;
              case "Наедине с собой":
                  user.PsychologicalTestPoints += 20;
-                 user.DialogStateId = DialogStateId.PsychologicalTestXSeventhQuestionState;
+                 user.DialogState = nameof(SeventhQuestionState);
                  _dbContext.Update(user);
                  await _dbContext.SaveChangesAsync();
                  await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно выражаете свои эмоции?", replyMarkup: newQuestionAnswersMarkup);
                  break;
              case "Занимаясь хобби":
                  user.PsychologicalTestPoints += 10;
-                 user.DialogStateId = DialogStateId.PsychologicalTestXSeventhQuestionState;
+                 user.DialogState = nameof(SeventhQuestionState);
                  _dbContext.Update(user);
                  await _dbContext.SaveChangesAsync();
                  await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно выражаете свои эмоции?", replyMarkup: newQuestionAnswersMarkup);
                  break;
              case "Работая или учась":
-                 await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestXSeventhQuestionState);
+                 await _userHelper.UpdateUserState(user, nameof(SeventhQuestionState));
                  await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно выражаете свои эмоции?", replyMarkup: newQuestionAnswersMarkup);
                  break;
                 default:
@@ -349,7 +345,6 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestSixthQuestionState;
     }
     
     public class SeventhQuestionState : IDialogState
@@ -373,27 +368,27 @@ public static class PsychologicalTest
             {
                 case "Открыто и честно":
                     user.PsychologicalTestPoints += 30;
-                    user.DialogStateId = DialogStateId.DefaultState;
+                    user.DialogState = nameof(DefaultState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _menuHelper.SendMainMenu(message, user);
                     break;
                 case "Сдержанно, но делаю это":
                     user.PsychologicalTestPoints += 20;
-                    user.DialogStateId = DialogStateId.DefaultState;
+                    user.DialogState = nameof(DefaultState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _menuHelper.SendMainMenu(message, user);
                     break;
                 case "С трудом выражаю свои чувства":
                     user.PsychologicalTestPoints += 10;
-                    user.DialogStateId = DialogStateId.DefaultState;
+                    user.DialogState = nameof(DefaultState);
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
                     await _menuHelper.SendMainMenu(message, user);
                     break;
                 case "Предпочитаю не показывать эмоции":
-                    await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+                    await _userHelper.UpdateUserState(user, nameof(DefaultState));
                     await _menuHelper.SendMainMenu(message, user);
                     break;
                 default:
@@ -402,6 +397,5 @@ public static class PsychologicalTest
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.PsychologicalTestXSeventhQuestionState;
     }
 }

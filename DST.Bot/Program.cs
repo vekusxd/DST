@@ -14,10 +14,10 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services
     .AddTg(builder.Configuration)
-    .AddStateManagement()
     .AddHelper()
     .AddSources()
-    .AddGigaChat(builder.Configuration);
+    .AddGigaChat(builder.Configuration)
+    .AddStateManagement();
 
 if (builder.Environment.IsProduction())
 {

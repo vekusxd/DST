@@ -13,9 +13,9 @@ public class UserHelper
         _dbContext = dbContext;
     }
 
-    public  Task UpdateUserState(User user, DialogStateId dialogState)
+    public  Task UpdateUserState(User user, string dialogState)
     {
-        user.DialogStateId = dialogState;
+        user.DialogState = dialogState;
         return Task.FromResult(_dbContext.SaveChangesAsync());
     }
 }

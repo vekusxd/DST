@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using DST.Bot.Database;
 using DST.Bot.Features.Common;
+using DST.Bot.Features.MainMenu;
 using DST.Bot.Features.StateManager;
 using HtmlAgilityPack;
 using Telegram.Bot;
@@ -47,7 +48,7 @@ public static partial class GetSources
             switch (message.Text)
             {
                 case "Отмена":
-                    await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+                    await _userHelper.UpdateUserState(user, nameof(DefaultState));
                     await _menuHelper.SendMainMenu(message, user);
                     break;
                 default:
@@ -57,7 +58,7 @@ public static partial class GetSources
                         .AddNewRow("КиберЛенинка")
                         .AddNewRow("Большая Российская Энциклопедия")
                         .AddNewRow("Отмена");
-                    user.DialogStateId = DialogStateId.FetchArticlesState;
+                    user.DialogState = nameof(FetchArticlesState);
                     user.ArticleSearchTerm = message.Text!;
                     _dbContext.Update(user);
                     await _dbContext.SaveChangesAsync();
@@ -66,7 +67,6 @@ public static partial class GetSources
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.WaitSourceQueryState;
     }
 
     public partial class FetchArticlesState : IDialogState
@@ -119,7 +119,7 @@ public static partial class GetSources
                         caption: "Найденные статьи");
                     break;
                 case "Отмена":
-                    await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+                    await _userHelper.UpdateUserState(user, nameof(DefaultState));
                     await _menuHelper.SendMainMenu(message, user);
                     break;
                 default:
@@ -311,7 +311,6 @@ public static partial class GetSources
         }
 
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FetchArticlesState;
 
         [System.Text.RegularExpressions.GeneratedRegex(@"\s+")]
         private static partial System.Text.RegularExpressions.Regex RusNebRegex();

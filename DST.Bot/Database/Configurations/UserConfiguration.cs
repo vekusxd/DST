@@ -14,6 +14,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.ChatId)
             .ValueGeneratedNever()
             .IsRequired();
+        
+        builder.Property(u => u.DialogState)
+            .HasMaxLength(255)
+            .IsRequired();
 
         builder.Property(u => u.Name)
             .HasMaxLength(255)
@@ -33,10 +37,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(u => u.GenerateTopicData)
             .WithOne(t => t.User)
             .HasForeignKey<GenerateTopicData>(t => t.UserId);
-
-        builder.Property(u => u.PsychologicalType)
-            .HasDefaultValue(PsychologicalType.NotSet);
-
+        
         builder.Navigation(u => u.FrontPageData).AutoInclude();
         builder.Navigation(u => u.GenerateTopicData).AutoInclude();
     }

@@ -1,4 +1,5 @@
 ﻿using DST.Bot.Features.Common;
+using DST.Bot.Features.PsycholigicalTest;
 using DST.Bot.Features.StateManager;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -22,7 +23,7 @@ public static class FirstTimeEncounter
         
         public async Task Handle(Message message, User user)
         {
-            await _userHelper.UpdateUserState(user, DialogStateId.PsychologicalTestFirstQuestionState);
+            await _userHelper.UpdateUserState(user, nameof(PsychologicalTest.FirstQuestionState));
             await _telegramBotClient.SendMessage(message.Chat, """
                                                             Прохождение теста.
                 Как вы обычно реагируете на критику?
@@ -32,7 +33,5 @@ public static class FirstTimeEncounter
                 .AddNewRow("Защищаюсь и объясняю свою точку зрения")
                 .AddNewRow("Игнорирую и продолжаю действовать по-своему"));
         }
-
-        public DialogStateId DialogStateId { get; } = DialogStateId.FirstTimeState;
     }
 }

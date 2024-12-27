@@ -1,10 +1,10 @@
 ﻿using DST.Bot.Database;
 using DST.Bot.Features.Common;
 using DST.Bot.Features.CommunicationStyleFactories;
+using DST.Bot.Features.PsycholigicalTest;
 using DST.Bot.Features.StateManager;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using User = DST.Bot.Entities.User;
 
@@ -32,7 +32,7 @@ public class DefaultState : IDialogState
         switch (message.Text)
         {
             case "Создать титульный лист":
-                await _helper.UpdateUserState(user, DialogStateId.FrontPageWaitInitials);
+                await _helper.UpdateUserState(user, nameof(GenerateFrontPage.GenerateFrontPage.WaitInitialsState));
                 await _botClient.SendMessage(message.Chat.Id,
                     $"{dialogFactory.FrontPageGenerationMessage()}.Введите ваши инициалы",
                     replyMarkup: new ReplyKeyboardMarkup().AddButton("Отмена"));
@@ -67,18 +67,18 @@ public class DefaultState : IDialogState
             case "Поиск источников и литературы по теме":
                 var replyMarkup = new ReplyKeyboardMarkup()
                     .AddNewRow("Отмена");
-                await _helper.UpdateUserState(user, DialogStateId.WaitSourceQueryState);
+                await _helper.UpdateUserState(user, nameof(GetSources.GetSources.WaitSourceQueryState));
                 await _botClient.SendMessage(message.Chat,
                     $"{dialogFactory.SourceFinderMessage()}.Введите название темы",
                     replyMarkup: replyMarkup);
                 break;
             case "Гига чат":
-                await _helper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                await _helper.UpdateUserState(user, nameof(GigaChat.GigaChat.GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
                 break;
             case "Пройти заново психологический тест":
                 user.PsychologicalTestPoints = 0;
-                user.DialogStateId = DialogStateId.PsychologicalTestFirstQuestionState;
+                user.DialogState = nameof(PsychologicalTest.FirstQuestionState);
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
                 await _botClient.SendMessage(message.Chat, """
@@ -98,5 +98,4 @@ public class DefaultState : IDialogState
         }
     }
 
-    public DialogStateId DialogStateId { get; } = DialogStateId.DefaultState;
 }

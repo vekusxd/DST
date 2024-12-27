@@ -2,6 +2,7 @@
 using DST.Bot.Database;
 using DST.Bot.Entities;
 using DST.Bot.Features.Common;
+using DST.Bot.Features.MainMenu;
 using DST.Bot.Features.StateManager;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
@@ -37,12 +38,12 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                await _userHelper.UpdateUserState(user, DialogStateId.DefaultState);
+                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _menuHelper.SendMainMenu(message, user);
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitCourse;
+                user.DialogState = nameof(WaitCourseState);
                 user.FrontPageData = new FrontPageData { Initials = message.Text, Course = null};
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -50,7 +51,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitInitials;
     }
 
     public class WaitCourseState : IDialogState
@@ -70,7 +70,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -78,7 +78,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitProfile;
+                user.DialogState = nameof(WaitProfileState);
                 user.FrontPageData.Course = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -86,7 +86,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitCourse;
     }
 
     public class WaitProfileState : IDialogState
@@ -106,7 +105,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -114,7 +113,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitTheme;
+                user.DialogState = nameof(WaitThemeState);
                 user.FrontPageData.Profile = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -122,7 +121,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitProfile;
     }
 
     public class WaitThemeState : IDialogState
@@ -142,7 +140,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -150,7 +148,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitGroup;
+                user.DialogState = nameof(WaitGroupState);
                 user.FrontPageData.Theme = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -158,7 +156,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitTheme;
     }
 
     public class WaitGroupState : IDialogState
@@ -178,7 +175,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -186,7 +183,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitSupervisorInitials;
+                user.DialogState = nameof(WaitSupervisorInitialsState);
                 user.FrontPageData.Group = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -194,7 +191,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitGroup;
     }
 
     public class WaitSupervisorInitialsState : IDialogState
@@ -214,7 +210,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -222,7 +218,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitSupervisorAcademicTitle;
+                user.DialogState = nameof(WaitSupervisorAcademicTitleState);
                 user.FrontPageData.SupervisorInitials = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -230,7 +226,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitSupervisorInitials;
     }
 
     public class WaitSupervisorAcademicTitleState : IDialogState
@@ -250,7 +245,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -258,7 +253,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitSupervisorAcademicDegree;
+                user.DialogState = nameof(WaitSupervisorAcademicDegreeState);
                 user.FrontPageData.SupervisorAcademicTitle = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -266,7 +261,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitSupervisorAcademicTitle;
     }
 
     public class WaitSupervisorAcademicDegreeState : IDialogState
@@ -286,7 +280,7 @@ public static class GenerateFrontPage
         {
             if (message.Text!.Equals("Отмена", StringComparison.InvariantCultureIgnoreCase))
             {
-                user.DialogStateId = DialogStateId.DefaultState;
+                user.DialogState = nameof(DefaultState);
                 user.FrontPageData = new FrontPageData();
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -294,7 +288,7 @@ public static class GenerateFrontPage
             }
             else
             {
-                user.DialogStateId = DialogStateId.FrontPageWaitSupervisorJobTitle;
+                user.DialogState = nameof(WaitSupervisorJobTitleState);
                 user.FrontPageData.SupervisorAcademicDegree = message.Text;
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -302,7 +296,6 @@ public static class GenerateFrontPage
             }
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitSupervisorAcademicDegree;
     }
 
     public class WaitSupervisorJobTitleState : IDialogState
@@ -320,7 +313,7 @@ public static class GenerateFrontPage
 
         public async Task Handle(Message message, User user)
         {
-            user.DialogStateId = DialogStateId.DefaultState;
+            user.DialogState = nameof(DefaultState);
             user.FrontPageData.SupervisorJobTitle = message.Text;
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();
@@ -332,7 +325,6 @@ public static class GenerateFrontPage
             await _dbContext.SaveChangesAsync();
         }
 
-        public DialogStateId DialogStateId { get; } = DialogStateId.FrontPageWaitSupervisorJobTitle;
     }
 
     private static MemoryStream GeneratePdf(FrontPageData frontPageData)
