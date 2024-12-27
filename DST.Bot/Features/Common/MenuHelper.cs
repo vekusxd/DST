@@ -20,6 +20,7 @@ public class MenuHelper
         .AddNewRow("Информация по введению в дипломной работе")
         .AddNewRow("Гига чат")
         .AddNewRow("Поиск источников и литературы по теме")
+        .AddNewRow("Оформление источников и сносок")
         .AddNewRow("Пройти заново психологический тест");
 
     public static ReplyKeyboardMarkup GigaChatMenuMarkup => new ReplyKeyboardMarkup()
@@ -29,6 +30,18 @@ public class MenuHelper
         .AddNewRow("Придумай темы для курсовой")
         .AddNewRow("Помоги со структурой работы")
         .AddNewRow("Отмена");
+
+    public static ReplyKeyboardMarkup DesignMenuMarkup => new ReplyKeyboardMarkup()
+        .AddNewRow("Источник")
+        .AddNewRow("Сноску")
+        .AddNewRow("Отмена");
+
+    public static ReplyKeyboardMarkup DesignSourceSelectorMarkup => new ReplyKeyboardMarkup()
+        .AddNewRow("Книгу")
+        .AddNewRow("Сайт")
+        .AddNewRow("Статью с сайта")
+        .AddNewRow("Отмена");
+
 
     public Task SendMainMenu(Message message, User user)
     {
@@ -43,5 +56,15 @@ public class MenuHelper
         return Task.FromResult(_botClient.SendMessage(message.Chat.Id,
             "Чего вы хотите?",
             replyMarkup: GigaChatMenuMarkup));
+    }
+
+    public Task SendSourceDesignMenu(Message message, User user)
+    {
+        return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вы хотите оформить?", replyMarkup: DesignMenuMarkup));
+    }
+    
+    public Task SendDesignSourceSelectorMenu(Message message, User user)
+    {
+        return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вам нужно оформить?", replyMarkup: DesignSourceSelectorMarkup));
     }
 }

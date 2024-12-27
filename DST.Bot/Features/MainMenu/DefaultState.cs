@@ -76,6 +76,10 @@ public class DefaultState : IDialogState
                 await _helper.UpdateUserState(user, nameof(GigaChat.GigaChat.GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
                 break;
+            case "Оформление источников и сносок":
+                await _helper.UpdateUserState(user, nameof(SourcesDesign.SourcesDesign.SourcesDesignQuestionState));
+                await _menuHelper.SendSourceDesignMenu(message, user);
+                break;
             case "Пройти заново психологический тест":
                 user.PsychologicalTestPoints = 0;
                 user.DialogState = nameof(PsychologicalTest.FirstQuestionState);
