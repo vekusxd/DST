@@ -18,6 +18,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Name)
             .HasMaxLength(255)
             .IsRequired();
+        
+        builder.Property(u => u.ArticleSearchTerm)
+            .HasMaxLength(255)
+            .IsRequired();
 
         builder.Property(u => u.PsychologicalTestPoints)
             .HasDefaultValue(0);

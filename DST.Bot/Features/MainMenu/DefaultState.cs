@@ -63,10 +63,12 @@ public class DefaultState : IDialogState
 
                 break;
             case "Поиск источников и литературы по теме":
+                var replyMarkup = new ReplyKeyboardMarkup()
+                    .AddNewRow("Отмена");
                 await _helper.UpdateUserState(user, DialogStateId.WaitSourceQueryState);
                 await _botClient.SendMessage(message.Chat,
                     $"{dialogFactory.SourceFinderMessage()}.Введите название темы",
-                    replyMarkup: new ReplyKeyboardMarkup().AddNewRow("Отмена"));
+                    replyMarkup: replyMarkup);
                 break;
             case "Ответ на вопрос":
                 await _helper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);

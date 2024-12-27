@@ -22,6 +22,7 @@ public enum DialogStateId
     FrontPageWaitSupervisorAcademicDegree,
     FrontPageWaitSupervisorJobTitle,
     WaitSourceQueryState,
+    FetchArticlesState,
     FirstTimeState,
     PsychologicalTestFirstQuestionState,
     PsychologicalTestSecondQuestionState,

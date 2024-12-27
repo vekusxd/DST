@@ -14,8 +14,9 @@ QuestPDF.Settings.License = LicenseType.Community;
 
 builder.Services
     .AddTg(builder.Configuration)
-    .AddHelper()
     .AddStateManagement()
+    .AddHelper()
+    .AddSources()
     .AddGigaChat(builder.Configuration);
 
 if (builder.Environment.IsProduction())
@@ -23,10 +24,7 @@ if (builder.Environment.IsProduction())
     builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("APP_URL") ?? "http://localhost:5000");
 }
 
-builder.Services.AddHttpClient("cyberleninka",o =>
-{
-    o.BaseAddress = new Uri("https://cyberleninka.ru/");
-});
+
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? throw new Exception("No connection string was found");
