@@ -15,12 +15,14 @@ public class DefaultState : IDialogState
     private readonly ITelegramBotClient _botClient;
     private readonly AppDbContext _dbContext;
     private readonly UserHelper _helper;
+    private readonly MenuHelper _menuHelper;
 
-    public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper helper)
+    public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper helper, MenuHelper menuHelper)
     {
         _botClient = botClient;
         _dbContext = dbContext;
         _helper = helper;
+        _menuHelper = menuHelper;
     }
 
     public async Task Handle(Message message, User user)
@@ -71,11 +73,8 @@ public class DefaultState : IDialogState
                     replyMarkup: replyMarkup);
                 break;
             case "Гига чат":
-                var gigaChatMarkup = MenuHelper.GigaChatMenuMarkup;
-                
                 await _helper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
-                await _botClient.SendMessage(message.Chat, "Чего вы хотите?",
-                    replyMarkup: gigaChatMarkup);
+                await _menuHelper.SendGigaChatMenu(message, user);
                 break;
             case "Пройти заново психологический тест":
                 user.PsychologicalTestPoints = 0;

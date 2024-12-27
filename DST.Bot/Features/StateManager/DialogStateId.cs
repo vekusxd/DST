@@ -32,5 +32,6 @@ public enum DialogStateId
     PsychologicalTestSixthQuestionState,
     PsychologicalTestXSeventhQuestionState,
     GigaChatQuestionState,
-    WaitForDefinitionQueryState
+    WaitForDefinitionQueryState,
+    WaitForSimilarTopicQueryState
 }

@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Web;
@@ -53,8 +54,10 @@ public static class GigaChat
                     await _botClient.SendMessage(message.Chat, "Введите термин, о котором хотите узнать информацию",
                         replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
-                case "Придумай темы для курсовой":
-                    await _botClient.SendMessage(message.Chat, "В процессе реализации");
+                case "Придумай похожие темы для курсовой":
+                    await _userHelper.UpdateUserState(user, DialogStateId.WaitForSimilarTopicQueryState);
+                    await _botClient.SendMessage(message.Chat, "Введите вашу тему",
+                        replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
                 case "Помоги с параметрами темы":
                     await _botClient.SendMessage(message.Chat, "В процессе реализации");
@@ -102,17 +105,78 @@ public static class GigaChat
             {
                 case "Отмена":
                     await _helper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
-                    await _menuHelper.SendMainMenu(message, user);
+                    await _menuHelper.SendGigaChatMenu(message, user);
                     break;
                 default:
-                    var response = await _gigaChatFetcher.GetDefinitionResponse(message.Text!);
+                    var word = message.Text!;
+
+                    var prompt =
+                        $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Во-первых напиши определение {word}, во-вторых создай список, первым номером списка будет первый пример предложения, всего список должен состоять из двух примеров предложений в которых обязательно будет {word} как часть этих примеров предложений.";
+
+                    var response = await _gigaChatFetcher.GetResponse(message.Text!);
+
+                    var encodedPart = HttpUtility.UrlEncode(message.Text);
+
+                    var wikiClient = _httpClientFactory.CreateClient("wikipedia");
+
+                    var wikiResponse = await wikiClient.GetAsync(encodedPart);
+
+                    if (wikiResponse.IsSuccessStatusCode)
+                    {
+                        response.AppendLine($"Ссылка на wiki: https://ru.wikipedia.org/wiki/{encodedPart}");
+                        response.AppendLine($"Ссылка на znanierussia: https://znanierussia.ru/articles/{encodedPart}");
+                    }
+
                     await _helper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
-                    await _botClient.SendMessage(message.Chat, response, replyMarkup: MenuHelper.GigaChatMenuMarkup);
+                    await _botClient.SendMessage(message.Chat, response.ToString(),
+                        replyMarkup: MenuHelper.GigaChatMenuMarkup);
                     break;
             }
         }
 
         public DialogStateId DialogStateId { get; } = DialogStateId.WaitForDefinitionQueryState;
+    }
+
+    public class WaitForSimilarTopicQueryState : IDialogState
+    {
+        private readonly UserHelper _userHelper;
+        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly MenuHelper _menuHelper;
+        private readonly GigaChatFetcher _gigaChatFetcher;
+
+        public WaitForSimilarTopicQueryState(UserHelper userHelper, ITelegramBotClient telegramBotClient,
+            MenuHelper menuHelper, GigaChatFetcher gigaChatFetcher)
+        {
+            _userHelper = userHelper;
+            _telegramBotClient = telegramBotClient;
+            _menuHelper = menuHelper;
+            _gigaChatFetcher = gigaChatFetcher;
+        }
+
+        public async Task Handle(Message message, User user)
+        {
+            switch (message.Text)
+            {
+                case "Отмена":
+                    await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                    await _menuHelper.SendGigaChatMenu(message, user);
+                    break;
+                default:
+                    var exampleTopic = message.Text!;
+
+                    var prompt =
+                        $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Создай мне пять тем для моей курсовой работы, которые будут близки по смыслу и значению с этой темой '{exampleTopic}'.";
+
+                    var response = await _gigaChatFetcher.GetResponse(message.Text!);
+
+                    await _userHelper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
+                    await _telegramBotClient.SendMessage(message.Chat, response.ToString(),
+                        replyMarkup: MenuHelper.GigaChatMenuMarkup);
+                    break;
+            }
+        }
+
+        public DialogStateId DialogStateId { get; } = DialogStateId.WaitForSimilarTopicQueryState;
     }
 
     public class GigaChatFetcher
@@ -126,7 +190,7 @@ public static class GigaChat
             _options = options;
         }
 
-        public async Task<string> GetDefinitionResponse(string word)
+        public async Task<StringBuilder> GetResponse(string prompt)
         {
             var client = _clientFactory.CreateClient("gigachat");
 
@@ -140,8 +204,7 @@ public static class GigaChat
                     new Messages
                     {
                         Role = "user",
-                        Content =
-                            $"Отвечай без вводных предложений, приветствий и подобных конструкций, пиши только то что я прошу. Во-первых напиши определение {word}, во-вторых создай список, первым номером списка будет первый пример предложения, всего список должен состоять из двух примеров предложений в которых обязательно будет {word} как часть этих примеров предложений.",
+                        Content = prompt,
                     }
                 ]
             };
@@ -152,7 +215,7 @@ public static class GigaChat
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 var token = await GetGigaChatJwtToken();
-                client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 response = await client.PostAsJsonAsync("chat/completions", rootObject);
             }
 
@@ -163,17 +226,7 @@ public static class GigaChat
                 sb.AppendLine(choice.Message.Content);
             }
 
-            var encodedPart = HttpUtility.UrlEncode(word);
-
-            var wikiClient = _clientFactory.CreateClient("wikipedia");
-
-            var wikiResponse = await wikiClient.GetAsync(encodedPart);
-
-            if (!wikiResponse.IsSuccessStatusCode) return sb.ToString();
-            
-            sb.AppendLine($"Ссылка на wiki: https://ru.wikipedia.org/wiki/{encodedPart}");
-            sb.AppendLine($"Ссылка на znanierussia: https://znanierussia.ru/articles/{encodedPart}");
-            return sb.ToString();
+            return sb;
         }
 
         private async Task<string> GetGigaChatJwtToken()

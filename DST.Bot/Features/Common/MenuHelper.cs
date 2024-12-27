@@ -24,9 +24,9 @@ public class MenuHelper
 
     public static ReplyKeyboardMarkup GigaChatMenuMarkup => new ReplyKeyboardMarkup()
         .AddNewRow("Подскажи определение термина")
-        .AddNewRow("Помоги с темами для курсовой")
-        .AddNewRow("Придумай темы для курсовой")
+        .AddNewRow("Придумай похожие темы для курсовой")
         .AddNewRow("Помоги с параметрами темы")
+        .AddNewRow("Помоги с темами для курсовой")
         .AddNewRow("Помоги со структурой работы")
         .AddNewRow("Отмена");
 
@@ -36,5 +36,12 @@ public class MenuHelper
         return Task.FromResult(_botClient.SendMessage(message.Chat.Id,
             $"Здесь будет меню и сообщение о приветствии. {dialogFactory.GetMainMenuMessage()}. Модель общения: {dialogFactory}(будет отображаться только во время разработки)",
             replyMarkup: MenuMarkup));
+    }
+
+    public Task SendGigaChatMenu(Message message, User user)
+    {
+        return Task.FromResult(_botClient.SendMessage(message.Chat.Id,
+            "Чего вы хотите?",
+            replyMarkup: GigaChatMenuMarkup));
     }
 }
