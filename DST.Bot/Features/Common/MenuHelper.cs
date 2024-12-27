@@ -15,16 +15,26 @@ public class MenuHelper
         _botClient = botClient;
     }
 
+    public static ReplyKeyboardMarkup MenuMarkup => new ReplyKeyboardMarkup()
+        .AddNewRow("Создать титульный лист")
+        .AddNewRow("Информация по введению в дипломной работе")
+        .AddNewRow("Гига чат")
+        .AddNewRow("Поиск источников и литературы по теме")
+        .AddNewRow("Пройти заново психологический тест");
+
+    public static ReplyKeyboardMarkup GigaChatMenuMarkup => new ReplyKeyboardMarkup()
+        .AddNewRow("Подскажи определение термина")
+        .AddNewRow("Помоги с темами для курсовой")
+        .AddNewRow("Придумай темы для курсовой")
+        .AddNewRow("Помоги с параметрами темы")
+        .AddNewRow("Помоги со структурой работы")
+        .AddNewRow("Отмена");
+
     public Task SendMainMenu(Message message, User user)
     {
         var dialogFactory = ICommunicationStyleFactory.CreateFactory(user.PsychologicalTestPoints);
         return Task.FromResult(_botClient.SendMessage(message.Chat.Id,
             $"Здесь будет меню и сообщение о приветствии. {dialogFactory.GetMainMenuMessage()}. Модель общения: {dialogFactory}(будет отображаться только во время разработки)",
-            replyMarkup: new ReplyKeyboardMarkup()
-                .AddNewRow("Создать титульный лист")
-                .AddNewRow("Информация по введению в дипломной работе")
-                .AddNewRow("Ответ на вопрос")
-                .AddNewRow("Поиск источников и литературы по теме")
-                .AddNewRow("Пройти заново психологический тест")));
+            replyMarkup: MenuMarkup));
     }
 }

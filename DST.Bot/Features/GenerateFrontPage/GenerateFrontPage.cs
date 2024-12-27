@@ -326,12 +326,7 @@ public static class GenerateFrontPage
             await _dbContext.SaveChangesAsync();
             await _botClient.SendDocument(message.Chat, new InputFileStream(GeneratePdf(user.FrontPageData), "result.pdf"),
                 caption: "Ваш документ",
-                replyMarkup: new ReplyKeyboardMarkup()
-                    .AddNewRow("Создать титульный лист")
-                    .AddNewRow("Информация по введению в дипломной работе")
-                    .AddNewRow("Ответ на вопрос")
-                    .AddNewRow("Поиск источников и литературы по теме")
-                    .AddNewRow("Пройти заново психологический тест"));
+                replyMarkup: MenuHelper.MenuMarkup);
             user.FrontPageData = new FrontPageData();
             _dbContext.Update(user);
             await _dbContext.SaveChangesAsync();

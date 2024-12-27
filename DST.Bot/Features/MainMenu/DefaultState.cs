@@ -70,10 +70,12 @@ public class DefaultState : IDialogState
                     $"{dialogFactory.SourceFinderMessage()}.Введите название темы",
                     replyMarkup: replyMarkup);
                 break;
-            case "Ответ на вопрос":
+            case "Гига чат":
+                var gigaChatMarkup = MenuHelper.GigaChatMenuMarkup;
+                
                 await _helper.UpdateUserState(user, DialogStateId.GigaChatQuestionState);
-                await _botClient.SendMessage(message.Chat, "Введите ваш вопрос",
-                    replyMarkup: new ReplyKeyboardMarkup().AddNewRow("Отмена"));
+                await _botClient.SendMessage(message.Chat, "Чего вы хотите?",
+                    replyMarkup: gigaChatMarkup);
                 break;
             case "Пройти заново психологический тест":
                 user.PsychologicalTestPoints = 0;
@@ -92,12 +94,7 @@ public class DefaultState : IDialogState
             default:
                 await _botClient.SendMessage(message.Chat.Id,
                     $"Здесь будет меню и сообщение о приветствии. {dialogFactory.GetMainMenuMessage()}. Модель общения: {dialogFactory}(будет отображаться только во время разработки)",
-                    replyMarkup: new ReplyKeyboardMarkup()
-                        .AddNewRow("Создать титульный лист")
-                        .AddNewRow("Информация по введению в дипломной работе")
-                        .AddNewRow("Ответ на вопрос")
-                        .AddNewRow("Поиск источников и литературы по теме")
-                        .AddNewRow("Пройти заново психологический тест"));
+                    replyMarkup: MenuHelper.MenuMarkup);
                 break;
         }
     }
