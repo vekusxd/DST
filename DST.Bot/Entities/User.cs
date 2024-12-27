@@ -12,4 +12,5 @@ public class User
     public FrontPageData FrontPageData { get; set; } = null!;
     public int PsychologicalTestPoints { get; set; } = 0;
     public GenerateTopicData GenerateTopicData { get; set; } = null!;
+    public BookDesignData BookDesignData { get; set; } = null!;
 }

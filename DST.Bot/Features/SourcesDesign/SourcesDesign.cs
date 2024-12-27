@@ -3,6 +3,7 @@ using DST.Bot.Features.MainMenu;
 using DST.Bot.Features.StateManager;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
 using User = DST.Bot.Entities.User;
 
 namespace DST.Bot.Features.SourcesDesign;
@@ -63,7 +64,8 @@ public static class SourcesDesign
             switch (message.Text)
             {
                 case "Книгу":
-                    await _botClient.SendMessage(message.Chat, "Здесь будет диалог для оформления книги");
+                    await _userHelper.UpdateUserState(user, nameof(SourcesGenerateBookDesign));
+                    await _botClient.SendMessage(message.Chat, "Введите фамилию автора", replyMarkup: new ReplyKeyboardMarkup("Отмена"));
                     break;
                 case "Сайт":
                     await _botClient.SendMessage(message.Chat, "Здесь будет диалог для оформления сайта");
@@ -75,6 +77,17 @@ public static class SourcesDesign
                     await _userHelper.UpdateUserState(user, nameof(SourcesDesignQuestionState));
                     await _menuHelper.SendSourceDesignMenu(message, user);
                     break;
+            }
+        }
+    }
+
+    public class SourcesGenerateBookDesign : IDialogState
+    {
+        public async Task Handle(Message message, User user)
+        {
+            switch (message.Text)
+            {
+                
             }
         }
     }

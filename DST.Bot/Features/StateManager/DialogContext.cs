@@ -89,6 +89,8 @@ public static class DialogContext
             nameof(SourcesDesign.SourcesDesign.SourcesDesignQuestionState));
         services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesDesignMenuState>(
             nameof(SourcesDesign.SourcesDesign.SourcesDesignMenuState));
+        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesign>(
+            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesign));
 
 
         services.AddScoped<DialogContextHandler>();

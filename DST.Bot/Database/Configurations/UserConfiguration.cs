@@ -14,7 +14,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.ChatId)
             .ValueGeneratedNever()
             .IsRequired();
-        
+
         builder.Property(u => u.DialogState)
             .HasMaxLength(255)
             .IsRequired();
@@ -37,22 +37,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(u => u.GenerateTopicData)
             .WithOne(t => t.User)
             .HasForeignKey<GenerateTopicData>(t => t.UserId);
-    }
-}
 
-public class GenerateTopicDataConfiguration : IEntityTypeConfiguration<GenerateTopicData>
-{
-    public void Configure(EntityTypeBuilder<GenerateTopicData> builder)
-    {
-        builder.HasKey(t => t.Id);
-
-        builder.Property(t => t.Country).HasMaxLength(255);
-        builder.Property(t => t.Language).HasMaxLength(255);
-        builder.Property(t => t.Scope).HasMaxLength(255);
-        builder.Property(t => t.TimePeriod).HasMaxLength(255);
-
-        builder.HasOne(t => t.User)
-            .WithOne(u => u.GenerateTopicData)
-            .HasForeignKey<GenerateTopicData>(u => u.UserId);
+        builder.HasOne(u => u.BookDesignData)
+            .WithOne(b => b.User)
+            .HasForeignKey<BookDesignData>(b => b.UserId);
     }
 }
