@@ -242,7 +242,7 @@ public static partial class GetSources
                         if (item is null) continue;
 
                         var titleNode = item.SelectSingleNode(".//div[contains(@class, 'info_5')]/a");
-                        var title = CleanHtml(titleNode?.InnerText.Trim()!);
+                        var title = titleNode?.InnerText.Trim();
 
                         if (string.IsNullOrEmpty(title)) continue;
 
