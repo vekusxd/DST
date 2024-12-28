@@ -24,8 +24,6 @@ if (builder.Environment.IsProduction())
     builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("APP_URL") ?? "http://localhost:5000");
 }
 
-
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? throw new Exception("No connection string was found");
 
