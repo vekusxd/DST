@@ -7,6 +7,4 @@ namespace DST.Bot.Features.StateManager;
 public interface IDialogState
 {
     public Task Handle(Message message ,User user);
-    public static string GetDialogId() => MethodBase.GetCurrentMethod()!.DeclaringType!.Name;
-    public string DialogId => this.ToString()!;
 }
