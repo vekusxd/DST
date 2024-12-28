@@ -13,4 +13,6 @@ public class User
     public int PsychologicalTestPoints { get; set; } = 0;
     public GenerateTopicData GenerateTopicData { get; set; } = null!;
     public BookDesignData BookDesignData { get; set; } = null!;
+    public SiteData SiteData { get; set; } = null!;
+    public SiteArticleData SiteArticleData { get; set; } = null!;
 }

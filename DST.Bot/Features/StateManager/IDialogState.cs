@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types;
+﻿using System.Reflection;
+using Telegram.Bot.Types;
 using User = DST.Bot.Entities.User;
 
 namespace DST.Bot.Features.StateManager;
@@ -6,4 +7,6 @@ namespace DST.Bot.Features.StateManager;
 public interface IDialogState
 {
     public Task Handle(Message message ,User user);
+    public static string GetDialogId() => MethodBase.GetCurrentMethod()!.DeclaringType!.Name;
+    public string DialogId => this.ToString()!;
 }

@@ -2,6 +2,7 @@
 using DST.Bot.Entities;
 using DST.Bot.Features.MainMenu;
 using DST.Bot.Features.PsycholigicalTest;
+using DST.Bot.Features.SourcesDesign;
 using Telegram.Bot.Types;
 using User = DST.Bot.Entities.User;
 
@@ -11,23 +12,7 @@ public static class DialogContext
 {
     public static IServiceCollection AddStateManagement(this IServiceCollection services)
     {
-        // services.Scan(scan => scan
-        //     .FromAssemblyOf<IDialogState>()
-        //     .AddClasses(classes => classes.AssignableTo<IDialogState>())
-        //     .AsSelfWithInterfaces()
-        //     .WithScopedLifetime()
-        // );
-
-        // var states = AppDomain.CurrentDomain.GetAssemblies()
-        //     .SelectMany(s => s.GetTypes())
-        //     .Where(p => typeof(IDialogState).IsAssignableFrom(p) && p.IsClass);
-        //
-        // foreach (var state in states)
-        // {
-        //     Console.WriteLine(state.Name);
-        // }
-
-        //Позже надо придумать как это регать автоматически
+        //Позже надо придумать как это регать автоматически (да, это плохо, но чем-то приходиться жертвовать)
         services.AddKeyedScoped<IDialogState, DefaultState>(nameof(DefaultState));
         services.AddKeyedScoped<IDialogState, PsychologicalTest.FirstQuestionState>(
             nameof(PsychologicalTest.FirstQuestionState));
@@ -89,36 +74,39 @@ public static class DialogContext
             nameof(SourcesDesign.SourcesDesign.SourcesDesignQuestionState));
         services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesDesignMenuState>(
             nameof(SourcesDesign.SourcesDesign.SourcesDesignMenuState));
-        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorLastName>(
-            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorLastName));
-        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorInitials>(
-            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorInitials));
-        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitBookTitle>(
-            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitBookTitle));
+        services.AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitAuthorLastName>(
+            nameof(CreateBook.SourcesGenerateBookDesignWaitAuthorLastName));
+        services.AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitAuthorInitials>(
+            nameof(CreateBook.SourcesGenerateBookDesignWaitAuthorInitials));
+        services.AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitBookTitle>(
+            nameof(CreateBook.SourcesGenerateBookDesignWaitBookTitle));
         services
-            .AddKeyedScoped<IDialogState,
-                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationPlace>(
-                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationPlace));
+            .AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitPublicationPlace>(
+                nameof(CreateBook.SourcesGenerateBookDesignWaitPublicationPlace));
         services
-            .AddKeyedScoped<IDialogState,
-                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublisher>(
-                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublisher));
+            .AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitPublisher>(
+                nameof(CreateBook.SourcesGenerateBookDesignWaitPublisher));
         services
-            .AddKeyedScoped<IDialogState,
-                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitYearOfPublication>(
-                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitYearOfPublication));
+            .AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitYearOfPublication>(
+                nameof(CreateBook.SourcesGenerateBookDesignWaitYearOfPublication));
         services
-            .AddKeyedScoped<IDialogState,
-                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitNumberOfPages>(
-                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitNumberOfPages));
+            .AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitNumberOfPages>(
+                nameof(CreateBook.SourcesGenerateBookDesignWaitNumberOfPages));
         services
-            .AddKeyedScoped<IDialogState,
-                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationDetails>(
-                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationDetails));
+            .AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitPublicationDetails>(
+                nameof(CreateBook.SourcesGenerateBookDesignWaitPublicationDetails));
         services
-            .AddKeyedScoped<IDialogState,
-                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitIsbn>(
-                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitIsbn));
+            .AddKeyedScoped<IDialogState, CreateBook.SourcesGenerateBookDesignWaitIsbn>(
+                nameof(CreateBook.SourcesGenerateBookDesignWaitIsbn));
+
+        services.AddKeyedScoped<IDialogState, CreateSite.GetSiteTitleState>(nameof(CreateSite.GetSiteTitleState));
+        services.AddKeyedScoped<IDialogState, CreateSite.GetSiteUrlState>(nameof(CreateSite.GetSiteUrlState));
+
+        services.AddKeyedScoped<IDialogState, CreateSiteArticle.GetArticleTitleState>(
+            nameof(CreateSiteArticle.GetArticleTitleState));
+        services.AddKeyedScoped<IDialogState, CreateSiteArticle.GetSiteTitleState>(
+            nameof(CreateSiteArticle.GetSiteTitleState));
+        services.AddKeyedScoped<IDialogState, CreateSiteArticle.GetUrlState>(nameof(CreateSiteArticle.GetUrlState));
 
         services.AddScoped<DialogContextHandler>();
 

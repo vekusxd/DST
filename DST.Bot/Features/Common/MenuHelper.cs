@@ -32,15 +32,18 @@ public class MenuHelper
         .AddButton("Помоги со структурой работы").AddNewRow("Отмена");
 
     public static ReplyKeyboardMarkup DesignMenuMarkup => new ReplyKeyboardMarkup()
-        .AddNewRow("Источник")
-        .AddNewRow("Сноску")
-        .AddNewRow("Отмена");
+        .AddNewRow()
+        .AddButton("Источник").AddButton("Сноску")
+        .AddNewRow()
+        .AddButton("Отмена");
 
     public static ReplyKeyboardMarkup DesignSourceSelectorMarkup => new ReplyKeyboardMarkup()
-        .AddNewRow("Книгу")
-        .AddNewRow("Сайт")
-        .AddNewRow("Статью с сайта")
-        .AddNewRow("Отмена");
+        .AddNewRow()
+        .AddButton("Книгу").AddButton("Сайт")
+        .AddNewRow()
+        .AddButton("Статью с сайта")
+        .AddNewRow()
+        .AddButton("Отмена");
 
 
     public Task SendMainMenu(Message message, User user)
