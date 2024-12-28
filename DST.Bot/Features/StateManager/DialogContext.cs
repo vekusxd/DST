@@ -89,9 +89,36 @@ public static class DialogContext
             nameof(SourcesDesign.SourcesDesign.SourcesDesignQuestionState));
         services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesDesignMenuState>(
             nameof(SourcesDesign.SourcesDesign.SourcesDesignMenuState));
-        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesign>(
-            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesign));
-
+        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorLastName>(
+            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorLastName));
+        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorInitials>(
+            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitAuthorInitials));
+        services.AddKeyedScoped<IDialogState, SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitBookTitle>(
+            nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitBookTitle));
+        services
+            .AddKeyedScoped<IDialogState,
+                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationPlace>(
+                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationPlace));
+        services
+            .AddKeyedScoped<IDialogState,
+                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublisher>(
+                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublisher));
+        services
+            .AddKeyedScoped<IDialogState,
+                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitYearOfPublication>(
+                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitYearOfPublication));
+        services
+            .AddKeyedScoped<IDialogState,
+                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitNumberOfPages>(
+                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitNumberOfPages));
+        services
+            .AddKeyedScoped<IDialogState,
+                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationDetails>(
+                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitPublicationDetails));
+        services
+            .AddKeyedScoped<IDialogState,
+                DST.Bot.Features.SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitIsbn>(
+                nameof(SourcesDesign.SourcesDesign.SourcesGenerateBookDesignWaitIsbn));
 
         services.AddScoped<DialogContextHandler>();
 

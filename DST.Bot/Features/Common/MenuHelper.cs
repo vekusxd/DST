@@ -64,6 +64,7 @@ public class MenuHelper
             replyMarkup: DesignMenuMarkup));
     }
 
+    
     public Task SendDesignSourceSelectorMenu(Message message, User user)
     {
         return Task.FromResult(_botClient.SendMessage(message.Chat, "Что вам нужно оформить?",
