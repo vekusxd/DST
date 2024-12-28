@@ -38,7 +38,7 @@ public static class CreateSiteArticle
             }
             else
             {
-                user.DialogState = nameof(GetSiteTitleState);
+                user.DialogState = nameof(GetArticleSiteTitleState);
                 await _dbContext.Entry(user).Reference(u => u.SiteArticleData).LoadAsync();
                 user.SiteArticleData = new SiteArticleData { Title = message.Text };
                 _dbContext.Update(user);
@@ -48,14 +48,14 @@ public static class CreateSiteArticle
         }
     }
 
-    public class GetSiteTitleState : IDialogState
+    public class GetArticleSiteTitleState : IDialogState
     {
         private readonly ITelegramBotClient _botClient;
         private readonly AppDbContext _dbContext;
         private readonly UserHelper _userHelper;
         private readonly MenuHelper _menuHelper;
 
-        public GetSiteTitleState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper userHelper,
+        public GetArticleSiteTitleState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper userHelper,
             MenuHelper menuHelper)
         {
             _botClient = botClient;
@@ -73,7 +73,7 @@ public static class CreateSiteArticle
             }
             else
             {
-                user.DialogState = nameof(GetUrlState);
+                user.DialogState = nameof(GetArticleUrlState);
                 await _dbContext.Entry(user).Reference(u => u.SiteArticleData).LoadAsync();
                 user.SiteArticleData.SiteTitle = message.Text;
                 _dbContext.Update(user);
@@ -83,14 +83,14 @@ public static class CreateSiteArticle
         }
     }
 
-    public class GetUrlState : IDialogState
+    public class GetArticleUrlState : IDialogState
     {
         private readonly ITelegramBotClient _botClient;
         private readonly AppDbContext _dbContext;
         private readonly UserHelper _userHelper;
         private readonly MenuHelper _menuHelper;
 
-        public GetUrlState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper userHelper,
+        public GetArticleUrlState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper userHelper,
             MenuHelper menuHelper)
         {
             _botClient = botClient;
