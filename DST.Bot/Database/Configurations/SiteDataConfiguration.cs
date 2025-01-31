@@ -12,7 +12,7 @@ public class SiteDataConfiguration : IEntityTypeConfiguration<SiteData>
 
         builder.Property(s => s.Title).HasMaxLength(255);
         builder.Property(s => s.Url).HasMaxLength(255);
-        
+
         builder.HasOne(s => s.User)
             .WithOne(u => u.SiteData)
             .HasForeignKey<SiteData>(u => u.UserId);

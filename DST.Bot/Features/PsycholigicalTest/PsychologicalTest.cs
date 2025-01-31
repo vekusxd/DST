@@ -153,7 +153,7 @@ public static class PsychologicalTest
                     await _dbContext.SaveChangesAsync();
                     await _telegramBotClient.SendMessage(message.Chat, "Как вы обычно принимаете решения?", replyMarkup: newQuestionAnswersMarkup);
                     break;
-                case "Знакомлюсь, но с осторожностью ":
+                case "Знакомлюсь, но с осторожностью":
                     user.PsychologicalTestPoints += 20;
                     user.DialogState = nameof(FourthQuestionState);
                     _dbContext.Update(user);

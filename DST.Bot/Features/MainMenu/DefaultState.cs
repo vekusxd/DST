@@ -1,4 +1,5 @@
 ﻿using DST.Bot.Database;
+using DST.Bot.Features.BugReport;
 using DST.Bot.Features.Common;
 using DST.Bot.Features.CommunicationStyleFactories;
 using DST.Bot.Features.PsycholigicalTest;
@@ -93,6 +94,11 @@ public class DefaultState : IDialogState
                     .AddNewRow("Чувствую себя обиженным, но стараюсь не показывать это")
                     .AddNewRow("Защищаюсь и объясняю свою точку зрения")
                     .AddNewRow("Игнорирую и продолжаю действовать по-своему"));
+                break;
+            case "Сообщить об ошибке":
+                await _helper.UpdateUserState(user, nameof(BugReportMenuState));
+                await _botClient.SendMessage(message.Chat, "С чем вы столкнулись?",
+                    replyMarkup: MenuHelper.BugReportSelectorMarkup);
                 break;
             default:
                 await _botClient.SendMessage(message.Chat.Id,

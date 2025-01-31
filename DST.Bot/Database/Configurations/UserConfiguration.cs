@@ -49,5 +49,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasOne(u => u.SiteArticleData)
             .WithOne(a => a.User)
             .HasForeignKey<SiteArticleData>(a => a.UserId);
+        
+        builder.HasOne(u => u.BugData)
+            .WithOne(b => b.User)
+            .HasForeignKey<BugData>(b => b.UserId);
     }
 }

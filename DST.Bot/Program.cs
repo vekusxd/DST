@@ -1,6 +1,5 @@
 using DST.Bot.Database;
 using DST.Bot.Features.Common;
-using DST.Bot.Features.GenerateFrontPage;
 using DST.Bot.Features.GetSources;
 using DST.Bot.Features.GigaChat;
 using DST.Bot.Features.SetupBot;
@@ -19,11 +18,6 @@ builder.Services
     .AddGigaChat(builder.Configuration)
     .AddStateManagement();
 
-if (builder.Environment.IsProduction())
-{
-    builder.WebHost.UseUrls(Environment.GetEnvironmentVariable("APP_URL") ?? "http://localhost:5000");
-}
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? throw new Exception("No connection string was found");
 
@@ -32,8 +26,7 @@ builder.Services.AddDbContext<AppDbContext>(
 
 var app = builder.Build();
 
-
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseWebHook();
 

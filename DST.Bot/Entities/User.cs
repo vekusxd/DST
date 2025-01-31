@@ -15,4 +15,5 @@ public class User
     public BookDesignData BookDesignData { get; set; } = null!;
     public SiteData SiteData { get; set; } = null!;
     public SiteArticleData SiteArticleData { get; set; } = null!;
+    public BugData BugData { get; set; } = null!;
 }

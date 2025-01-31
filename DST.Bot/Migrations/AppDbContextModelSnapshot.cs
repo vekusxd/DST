@@ -67,6 +67,33 @@ namespace DST.Bot.Migrations
                     b.ToTable("BookDesignData");
                 });
 
+            modelBuilder.Entity("DST.Bot.Entities.BugData", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(-1)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("BugData");
+                });
+
             modelBuilder.Entity("DST.Bot.Entities.FrontPageData", b =>
                 {
                     b.Property<long>("Id")
@@ -251,6 +278,17 @@ namespace DST.Bot.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DST.Bot.Entities.BugData", b =>
+                {
+                    b.HasOne("DST.Bot.Entities.User", "User")
+                        .WithOne("BugData")
+                        .HasForeignKey("DST.Bot.Entities.BugData", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DST.Bot.Entities.FrontPageData", b =>
                 {
                     b.HasOne("DST.Bot.Entities.User", "User")
@@ -298,6 +336,9 @@ namespace DST.Bot.Migrations
             modelBuilder.Entity("DST.Bot.Entities.User", b =>
                 {
                     b.Navigation("BookDesignData")
+                        .IsRequired();
+
+                    b.Navigation("BugData")
                         .IsRequired();
 
                     b.Navigation("FrontPageData")

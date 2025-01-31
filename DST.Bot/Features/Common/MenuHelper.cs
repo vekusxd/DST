@@ -21,7 +21,9 @@ public class MenuHelper
         .AddNewRow()
         .AddButton("Помощь с работой").AddButton("Поиск источников и литературы по теме")
         .AddNewRow()
-        .AddButton("Оформление источников и сносок").AddButton("Пройти заново психологический тест");
+        .AddButton("Оформление источников и сносок").AddButton("Пройти заново психологический тест")
+        .AddNewRow()
+        .AddButton("Сообщить об ошибке");
 
     public static ReplyKeyboardMarkup GigaChatMenuMarkup => new ReplyKeyboardMarkup()
         .AddNewRow()
@@ -45,6 +47,18 @@ public class MenuHelper
         .AddNewRow()
         .AddButton("Отмена");
 
+    public static ReplyKeyboardMarkup BugReportSelectorMarkup => new ReplyKeyboardMarkup()
+        .AddNewRow()
+        .AddButton("Проблемы с функционалом").AddButton("Некорректные результаты")
+        .AddNewRow()
+        .AddButton("Проблемы с интерфейсом").AddButton("Технические сбои")
+        .AddNewRow()
+        .AddButton("Другое")
+        .AddNewRow()
+        .AddButton("Отмена");
+
+    public static ReplyKeyboardMarkup CancelButtonMarkup => new ReplyKeyboardMarkup()
+        .AddNewRow("Отмена");
 
     public Task SendMainMenu(Message message, User user)
     {
@@ -59,6 +73,11 @@ public class MenuHelper
         return Task.FromResult(_botClient.SendMessage(message.Chat.Id,
             "Чего вы хотите?",
             replyMarkup: GigaChatMenuMarkup));
+    }
+
+    public Task SendDefaultErrorMessage(Message message, User user)
+    {
+        return Task.FromResult(_botClient.SendMessage(message.Chat, "Выберите доступный вариант"));
     }
 
     public Task SendSourceDesignMenu(Message message, User user)
