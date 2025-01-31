@@ -1,9 +1,10 @@
 ﻿using DST.Bot.Database;
 using DST.Bot.Entities;
 using DST.Bot.Features.Common;
+using DST.Bot.Features.Hangfire;
 using DST.Bot.Features.MainMenu;
 using DST.Bot.Features.StateManager;
-using Microsoft.EntityFrameworkCore;
+using Hangfire;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using User = DST.Bot.Entities.User;
@@ -39,7 +40,7 @@ public class BugReportMenuState : IDialogState
             case "Проблемы с интерфейсом":
             case "Технические сбои":
                 await _dbContext.Entry(user).Reference(u => u.BugData).LoadAsync();
-                user.BugData = new BugData { Title = message.Text };
+                user.BugData.Title = message.Text;
                 user.DialogState = nameof(BugReportFinalState);
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -79,12 +80,13 @@ public class BugReportWaitCategoryState : IDialogState
         switch (message.Text)
         {
             case "Отмена":
-                await _userHelper.UpdateUserState(user, nameof(DefaultState));
-                await _menuHelper.SendMainMenu(message, user);
+                await _userHelper.UpdateUserState(user, nameof(BugReportMenuState));
+                await _botClient.SendMessage(message.Chat, "С чем вы столкнулись?",
+                    replyMarkup: MenuHelper.BugReportSelectorMarkup);
                 break;
             default:
                 await _dbContext.Entry(user).Reference(u => u.BugData).LoadAsync();
-                user.BugData = new BugData { Title = message.Text! };
+                user.BugData.Title = message.Text!;
                 user.DialogState = nameof(BugReportFinalState);
                 _dbContext.Update(user);
                 await _dbContext.SaveChangesAsync();
@@ -101,14 +103,16 @@ public class BugReportFinalState : IDialogState
     private readonly MenuHelper _menuHelper;
     private readonly UserHelper _userHelper;
     private readonly ITelegramBotClient _botClient;
+    private readonly BackgroundJobs _backgroundJobs;
 
     public BugReportFinalState(AppDbContext dbContext, MenuHelper menuHelper, UserHelper userHelper,
-        ITelegramBotClient botClient)
+        ITelegramBotClient botClient, BackgroundJobs backgroundJobs)
     {
         _dbContext = dbContext;
         _menuHelper = menuHelper;
         _userHelper = userHelper;
         _botClient = botClient;
+        _backgroundJobs = backgroundJobs;
     }
 
     public async Task Handle(Message message, User user)
@@ -116,16 +120,24 @@ public class BugReportFinalState : IDialogState
         switch (message.Text)
         {
             case "Отмена":
-                await _userHelper.UpdateUserState(user, nameof(DefaultState));
+                await _userHelper.UpdateUserState(user, nameof(BugReportMenuState));
+                await _botClient.SendMessage(message.Chat, "С чем вы столкнулись?",
+                    replyMarkup: MenuHelper.BugReportSelectorMarkup);
                 break;
             default:
                 await _dbContext.Entry(user).Reference(u => u.BugData).LoadAsync();
-                await _userHelper.UpdateUserState(user, nameof(DefaultState));
                 await _botClient.SendMessage(-1002356200554,
                     $"Новая жалоба от @{message.From!.Username}. Категория: {user.BugData.Title}, проблема: {message.Text}");
+                user.BugData.CountThisDay += 1;
+                user.DialogState = nameof(DefaultState);
+                _dbContext.Update(user);
+                await _dbContext.SaveChangesAsync();
+                BackgroundJob.Schedule(
+                    () => _backgroundJobs.DecrementCounter(user),
+                    TimeSpan.FromDays(1));
+                await _botClient.SendMessage(message.Chat, "Ваша жалоба была отправлена",
+                    replyMarkup: MenuHelper.MenuMarkup);
                 break;
         }
-
-        await _menuHelper.SendMainMenu(message, user);
     }
 }

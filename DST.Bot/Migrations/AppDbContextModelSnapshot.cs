@@ -78,6 +78,9 @@ namespace DST.Bot.Migrations
                         .HasMaxLength(-1)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("CountThisDay")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(255)

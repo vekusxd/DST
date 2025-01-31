@@ -53,10 +53,11 @@ public static partial class GetSources
                     break;
                 default:
                     var replyMarkup = new ReplyKeyboardMarkup()
-                        .AddNewRow("НЭБ Национальная электронная библиотека")
-                        .AddNewRow("Кодекс")
-                        .AddNewRow("КиберЛенинка")
-                        .AddNewRow("Большая Российская Энциклопедия")
+                        .AddNewRow()
+                        .AddButton("НЭБ Национальная электронная библиотека").AddButton("Кодекс")
+                        .AddNewRow("")
+                        .AddButton("КиберЛенинка").AddButton("Большая Российская Энциклопедия")
+                        .AddNewRow()
                         .AddNewRow("Отмена");
                     user.DialogState = nameof(FetchArticlesState);
                     user.ArticleSearchTerm = message.Text!;

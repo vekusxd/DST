@@ -2,8 +2,10 @@ using DST.Bot.Database;
 using DST.Bot.Features.Common;
 using DST.Bot.Features.GetSources;
 using DST.Bot.Features.GigaChat;
+using DST.Bot.Features.Hangfire;
 using DST.Bot.Features.SetupBot;
 using DST.Bot.Features.StateManager;
+using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Infrastructure;
 
@@ -16,7 +18,8 @@ builder.Services
     .AddHelper()
     .AddSources()
     .AddGigaChat(builder.Configuration)
-    .AddStateManagement();
+    .AddStateManagement()
+    .AddHangfire(builder.Configuration);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
                        ?? throw new Exception("No connection string was found");
@@ -29,6 +32,8 @@ var app = builder.Build();
 // app.UseHttpsRedirection();
 
 app.UseWebHook();
+
+app.UseHangfireDashboard();
 
 app.Run();
 

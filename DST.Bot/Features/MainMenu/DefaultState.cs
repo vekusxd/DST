@@ -15,14 +15,15 @@ public class DefaultState : IDialogState
 {
     private readonly ITelegramBotClient _botClient;
     private readonly AppDbContext _dbContext;
-    private readonly UserHelper _helper;
+    private readonly UserHelper _userHelper;
     private readonly MenuHelper _menuHelper;
 
-    public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper helper, MenuHelper menuHelper)
+    public DefaultState(ITelegramBotClient botClient, AppDbContext dbContext, UserHelper userHelper,
+        MenuHelper menuHelper)
     {
         _botClient = botClient;
         _dbContext = dbContext;
-        _helper = helper;
+        _userHelper = userHelper;
         _menuHelper = menuHelper;
     }
 
@@ -33,7 +34,7 @@ public class DefaultState : IDialogState
         switch (message.Text)
         {
             case "Создать титульный лист":
-                await _helper.UpdateUserState(user, nameof(GenerateFrontPage.GenerateFrontPage.WaitInitialsState));
+                await _userHelper.UpdateUserState(user, nameof(GenerateFrontPage.GenerateFrontPage.WaitInitialsState));
                 await _botClient.SendMessage(message.Chat.Id,
                     $"{dialogFactory.FrontPageGenerationMessage()}.Введите ваши инициалы",
                     replyMarkup: new ReplyKeyboardMarkup().AddButton("Отмена"));
@@ -68,17 +69,17 @@ public class DefaultState : IDialogState
             case "Поиск источников и литературы по теме":
                 var replyMarkup = new ReplyKeyboardMarkup()
                     .AddNewRow("Отмена");
-                await _helper.UpdateUserState(user, nameof(GetSources.GetSources.WaitSourceQueryState));
+                await _userHelper.UpdateUserState(user, nameof(GetSources.GetSources.WaitSourceQueryState));
                 await _botClient.SendMessage(message.Chat,
                     $"{dialogFactory.SourceFinderMessage()}.Введите название темы",
                     replyMarkup: replyMarkup);
                 break;
             case "Помощь с работой":
-                await _helper.UpdateUserState(user, nameof(GigaChat.GigaChat.GigaChatQuestionState));
+                await _userHelper.UpdateUserState(user, nameof(GigaChat.GigaChat.GigaChatQuestionState));
                 await _menuHelper.SendGigaChatMenu(message, user);
                 break;
             case "Оформление источников и сносок":
-                await _helper.UpdateUserState(user, nameof(SourcesDesign.SourcesDesign.SourcesDesignQuestionState));
+                await _userHelper.UpdateUserState(user, nameof(SourcesDesign.SourcesDesign.SourcesDesignQuestionState));
                 await _menuHelper.SendSourceDesignMenu(message, user);
                 break;
             case "Пройти заново психологический тест":
@@ -96,9 +97,21 @@ public class DefaultState : IDialogState
                     .AddNewRow("Игнорирую и продолжаю действовать по-своему"));
                 break;
             case "Сообщить об ошибке":
-                await _helper.UpdateUserState(user, nameof(BugReportMenuState));
-                await _botClient.SendMessage(message.Chat, "С чем вы столкнулись?",
-                    replyMarkup: MenuHelper.BugReportSelectorMarkup);
+                await _dbContext.Entry(user).Reference(u => u.BugData).LoadAsync();
+                if (user.BugData.CountThisDay >= 10)
+                {
+                    await _userHelper.UpdateUserState(user, nameof(DefaultState));
+                    await _botClient.SendMessage(message.Chat,
+                        "Подождите до завтра, сегодня вы отправили слишком много запросов (10)",
+                        replyMarkup: MenuHelper.MenuMarkup);
+                }
+                else
+                {
+                    await _userHelper.UpdateUserState(user, nameof(BugReportMenuState));
+                    await _botClient.SendMessage(message.Chat, "С чем вы столкнулись?",
+                        replyMarkup: MenuHelper.BugReportSelectorMarkup);
+                }
+
                 break;
             default:
                 await _botClient.SendMessage(message.Chat.Id,
@@ -107,5 +120,4 @@ public class DefaultState : IDialogState
                 break;
         }
     }
-
 }

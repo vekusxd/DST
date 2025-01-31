@@ -1,4 +1,6 @@
 ﻿using DST.Bot.Features.StateManager;
+using Hangfire;
+using Hangfire.Storage.SQLite;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.Options;
 using Telegram.Bot;
@@ -13,41 +15,43 @@ public static class SetupBot
     public static IServiceCollection AddTg(this IServiceCollection services, IConfigurationManager configurationManager)
     {
         services.Configure<TgBotOptions>(configurationManager.GetRequiredSection(TgBotOptions.TgBot));
-        
+
         var botOptions = configurationManager
             .GetRequiredSection(TgBotOptions.TgBot)
             .Get<TgBotOptions>() ?? throw new Exception("Missing tg configuration");
-        
+
         services.ConfigureTelegramBot<JsonOptions>(opts => opts.SerializerOptions);
-        
+
         services
             .AddHttpClient("tgWebHook")
             .RemoveAllLoggers()
             .AddTypedClient<ITelegramBotClient>(client => new TelegramBotClient(botOptions.Token, client));
 
         services.AddScoped<HandleTgUpdate>();
-        
+
+
         return services;
     }
-    
+
     public static void UseWebHook(this IEndpointRouteBuilder endpoints)
     {
         endpoints.MapGet("/bot/setWebhook", async (ITelegramBotClient bot, IOptions<TgBotOptions> options) =>
-        { 
+        {
             await bot.SetWebhook(options.Value.WebHookUrl);
             return $"Webhook set to {options.Value.WebHookUrl}";
         });
 
-        endpoints.MapPost("/api/update", async (ITelegramBotClient bot, Update update, HandleTgUpdate handleTgUpdate, CancellationToken ct) =>
-        {
-            if (update.Message?.Text is null) return;	
-            var msg = update.Message;
-            Console.WriteLine($"Received message '{msg.Text}' in {msg.Chat}");
-            await handleTgUpdate.HandleUpdateAsync(bot, update, ct);
-        });
+        endpoints.MapPost("/api/update",
+            async (ITelegramBotClient bot, Update update, HandleTgUpdate handleTgUpdate, CancellationToken ct) =>
+            {
+                if (update.Message?.Text is null) return;
+                var msg = update.Message;
+                Console.WriteLine($"Received message '{msg.Text}' in {msg.Chat}");
+                await handleTgUpdate.HandleUpdateAsync(bot, update, ct);
+            });
     }
 
-    
+
     public class HandleTgUpdate : IUpdateHandler
     {
         private readonly ITelegramBotClient _botClient;
@@ -58,8 +62,9 @@ public static class SetupBot
             _botClient = botClient;
             _dialogContextHandler = dialogContextHandler;
         }
-        
-        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+
+        public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update,
+            CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
             await (update switch
@@ -77,7 +82,7 @@ public static class SetupBot
             if (exception is RequestException)
                 await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
         }
-        
+
         private async Task OnCallbackQuery(CallbackQuery callbackQuery)
         {
             await _botClient.SendMessage(callbackQuery.Message!.Chat.Id, "Some text");
@@ -104,8 +109,8 @@ public static class SetupBot
             }
         }
     }
-    
-    
+
+
     public class TgBotOptions
     {
         public const string TgBot = "TgBot";
