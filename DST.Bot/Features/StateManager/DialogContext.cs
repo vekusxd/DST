@@ -19,6 +19,8 @@ public static class DialogContext
         
         foreach (var state in states)
         {
+            if (services.FirstOrDefault(t => (string) t.ServiceKey! == state.Name) != null) 
+                throw new Exception($"State with this name: {state.Name}, already registered, rename it please.");
             services.AddKeyedScoped(typeof(IDialogState), state.Name,state);
         }
         
